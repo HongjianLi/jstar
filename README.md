@@ -26,7 +26,7 @@ jstar is a contemporary website for hosting drug discovery services such as liga
 * Jessie Sze
 
 ## Logo
-![jstar logo](https://github.com/HongjianLi/jstar/blob/master/public/logo.png)
+![jstar logo](https://github.com/HongjianLi/jstar/blob/master/public/logo.svg)
 
 [istar]: https://github.com/HongjianLi/istar
 [jQuery]: https://github.com/jquery/jquery
