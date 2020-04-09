@@ -1,0 +1,53 @@
+.ribbon {
+	position: absolute;
+	z-index: 2000;
+	top: 0;
+	left: 0;
+	width: 134px;
+	height: 134px;
+	background: url(http://s3.amazonaws.com/github/ribbons/forkme_left_orange_ff7600.png);
+	opacity: .7;
+	transition: opacity .5s linear;
+}
+
+.ribbon:hover {
+	opacity: 1;
+}
+
+.jumbotron {
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+.jumbotron h1 {
+	font-weight: bold;
+}
+
+.jumbotron img {
+	height: 60px;
+	padding-right: 8px;
+}
+
+.card-deck .card a {
+	text-align: center;
+}
+
+.card-deck .card a img {
+	width: 256px;
+	height: 256px;
+}
+
+section {
+	padding-bottom: 20px;
+}
+
+section h2 {
+	text-align: center;
+}
+
+footer {
+	padding-top: 10px;
+	margin: 10px 0;
+	border-top: 1px solid #eeeeee;
+	text-align: center;
+}
