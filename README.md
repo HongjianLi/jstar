@@ -1,5 +1,5 @@
 # jstar
-jstar is a contemporary website for hosting drug discovery services such as ligand-based virtual screening and structure-based virtual screening. jstar is a complete rewrite of [istar].
+jstar is a modern website for hosting drug discovery services such as ligand-based virtual screening and structure-based virtual screening. jstar is a complete rewrite of [istar].
 
 ## Architecture
 ![jstar architecture](https://github.com/HongjianLi/jstar/blob/master/public/architecture.png)
