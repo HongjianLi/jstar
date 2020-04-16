@@ -17,6 +17,7 @@
 .jumbotron {
 	padding-top: 10px;
 	padding-bottom: 10px;
+	text-align: center;
 }
 
 .jumbotron h1 {
@@ -28,21 +29,17 @@
 	padding-right: 8px;
 }
 
-.card-deck .card a {
-	text-align: center;
-}
-
-.card-deck .card a img {
-	width: 256px;
-	height: 256px;
-}
-
 section {
 	padding-bottom: 20px;
 }
 
-section h2 {
+section h4 {
 	text-align: center;
+	padding-bottom: 8px;
+}
+
+hr {
+	border-top: 1px dashed #eeeeee;
 }
 
 footer {
