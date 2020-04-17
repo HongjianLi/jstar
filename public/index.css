@@ -22,6 +22,7 @@
 
 .jumbotron h1 {
 	font-weight: bold;
+	padding-bottom: 10px;
 }
 
 .jumbotron img {
@@ -47,4 +48,9 @@ footer {
 	margin: 10px 0;
 	border-top: 1px solid #eeeeee;
 	text-align: center;
+}
+
+.descriptorDistributionChart {
+	width: 100%;
+	height: 250px;
 }
