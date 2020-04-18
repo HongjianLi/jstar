@@ -95,41 +95,57 @@ $(() => {
 		});
 		return db;
 	});
-	const db = databases[0];
-	['name', 'version', 'accessDate', 'numCompounds'].forEach((key) => {
+/*	['name', 'version', 'accessDate', 'numCompounds'].forEach((key) => {
 		$(`#${key}`).text(db[key]);
 	});
 	['link'].forEach((key) => {
 		$(`#${key}`).attr('href', db[key]);
-	});
-	db.descriptors.forEach((descriptor) => {
-		const distDiv = document.getElementById(`${descriptor.name}Dist`);
-		const distChart = echarts.init(distDiv, 'dark');
-		const chartOption = {
-			title: {
-				text: `${descriptor.fullName}`,
-				subtext: `${descriptor.name} ∈ [${descriptor.min}, ${descriptor.max}]`,
-				left: 'center',
-			},
-			xAxis: {
-				type: 'category',
-				data: descriptor.xAxisData,
-				axisTick: {
-					show: false,
-				},				
-			},
-			yAxis: {
-				show: false,
-			},
-			series: [{
-				type: 'bar',
-				data: descriptor.seriesData,
-				label: {
-					show: true,
-					position: 'top',
+	});*/
+	const dbTableBody = $('#dbTableBody');
+	const dbSelected = (tr) => {
+		$('tr', dbTableBody).removeClass('bg-primary');
+		$(tr).addClass('bg-primary');
+		const dbName = tr.children[0].innerText;
+		const db = databases.find((db) => {
+			return db.name === dbName;
+		});
+		db.descriptors.forEach((descriptor) => {
+			const distDiv = document.getElementById(`${descriptor.name}Dist`);
+			const distChart = echarts.init(distDiv, 'dark');
+			const chartOption = {
+				title: {
+					text: `${descriptor.fullName}`,
+					subtext: `${descriptor.name} ∈ [${descriptor.min}, ${descriptor.max}]`,
+					left: 'center',
+					top: 20,
 				},
-			}]
-		};
-		distChart.setOption(chartOption);
+				grid: {
+					top: 100,
+				},
+				xAxis: {
+					type: 'category',
+					data: descriptor.xAxisData,
+					axisTick: {
+						show: false,
+					},				
+				},
+				yAxis: {
+					show: false,
+				},
+				series: [{
+					type: 'bar',
+					data: descriptor.seriesData,
+					label: {
+						show: true,
+						position: 'top',
+					},
+				}]
+			};
+			distChart.setOption(chartOption);
+		});
+	};
+	dbTableBody.click((e) => {
+		dbSelected(e.target.parentNode);
 	});
+	dbSelected(dbTableBody[0].children[0]);
 });
