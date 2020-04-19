@@ -15,23 +15,21 @@
 }
 
 .jumbotron {
-	padding-top: 10px;
-	padding-bottom: 10px;
-	text-align: center;
-}
-
-.jumbotron h1 {
-	font-weight: bold;
-	padding-bottom: 10px;
+	padding-top: 1px;
+	padding-bottom: 1px;
 }
 
 .jumbotron img {
-	height: 60px;
+	height: 30px;
 	padding-right: 8px;
 }
 
 section {
 	padding-bottom: 20px;
+}
+
+section h4 {
+	font-weight: bold;
 }
 
 section h4 {
