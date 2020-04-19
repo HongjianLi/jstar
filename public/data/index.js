@@ -95,15 +95,9 @@ $(() => {
 		});
 		return db;
 	});
-/*	['name', 'version', 'accessDate', 'numCompounds'].forEach((key) => {
-		$(`#${key}`).text(db[key]);
-	});
-	['link'].forEach((key) => {
-		$(`#${key}`).attr('href', db[key]);
-	});*/
-	const dbTableBody = $('#dbTableBody');
-	const dbSelected = (tr) => {
-		$('tr', dbTableBody).removeClass('bg-primary');
+	$('#dbTableBody').click((e) => {
+		$('tr', e.currentTarget).removeClass('bg-primary');
+		const tr = e.target.parentNode;
 		$(tr).addClass('bg-primary');
 		const dbName = tr.children[0].innerText;
 		const db = databases.find((db) => {
@@ -132,20 +126,16 @@ $(() => {
 				yAxis: {
 					show: false,
 				},
-				series: [{
+				series: {
 					type: 'bar',
 					data: descriptor.seriesData,
 					label: {
 						show: true,
 						position: 'top',
 					},
-				}]
+				},
 			};
 			distChart.setOption(chartOption);
 		});
-	};
-	dbTableBody.click((e) => {
-		dbSelected(e.target.parentNode);
 	});
-	dbSelected(dbTableBody[0].children[0]);
 });
