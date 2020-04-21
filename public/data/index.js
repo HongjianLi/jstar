@@ -1026,6 +1026,9 @@ $(() => {
 					label: {
 						show: true,
 						position: 'top',
+//						formatter: (params) => {
+//							return `${params.data}\n${(params.data/db.numCompounds*100).toFixed(2)}%`; // Display percentage as well.
+//						},
 					},
 				},
 			};
