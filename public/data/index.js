@@ -989,6 +989,14 @@ $(() => {
 			console.assert((tdIdx === 3 ? parseInt(text.replace(/,/g, '')) : text) === db[['name', 'version', 'accessDate', 'numCompounds'][tdIdx]]);
 		});
 	});
+	const d3 = /(\d+)(\d{3})/;
+	Number.prototype.thousandize = function() {
+		let s = this.toString();
+		while (d3.test(s)) {
+			s = s.replace(d3, '$1,$2');
+		}
+		return s;
+	};
 	$('#dbTableBody').click((e) => {
 		$('tr', e.currentTarget).removeClass('bg-primary');
 		const tr = e.target.parentNode;
@@ -1026,9 +1034,9 @@ $(() => {
 					label: {
 						show: true,
 						position: 'top',
-//						formatter: (params) => {
-//							return `${params.data}\n${(params.data/db.numCompounds*100).toFixed(2)}%`; // Display percentage as well.
-//						},
+						formatter: (params) => {
+							return `${params.data.thousandize()}`; // Optionally, append `${(params.data/db.numCompounds*100).toFixed(2)}%` to display percentage as well.
+						},
 					},
 				},
 			};
