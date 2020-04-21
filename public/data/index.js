@@ -895,7 +895,7 @@ $(() => {
 	},{
 		name: 'WITHDRAWN',
 		link: 'http://cheminfo.charite.de/withdrawn/',
-		version: 'September 2015',
+		version: 'Sep 2015',
 		accessDate: '2020-01-21',
 		numCompounds: 613,
 		descriptors: [{
@@ -981,6 +981,13 @@ $(() => {
 			Object.assign(descriptor, d);
 		});
 		return db;
+	});
+	$('#dbTableBody tr').each((trIdx, tr) => {
+		const db = databases[trIdx];
+		$(tr).children().each((tdIdx, td) => {
+			const text = $(td).text();
+			console.assert((tdIdx === 3 ? parseInt(text.replace(/,/g, '')) : text) === db[['name', 'version', 'accessDate', 'numCompounds'][tdIdx]]);
+		});
 	});
 	$('#dbTableBody').click((e) => {
 		$('tr', e.currentTarget).removeClass('bg-primary');
