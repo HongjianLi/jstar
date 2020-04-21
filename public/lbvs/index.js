@@ -1,4 +1,5 @@
 $(() => {
+	$('.form-group a').tooltip();
 	const query_label = $('#query_label');
 	$('#submit').click(() => {
 		const file = $('#query').get(0).files[0];
@@ -10,7 +11,7 @@ $(() => {
 		reader.onload = () => {
 			$.post('job', {
 				query: reader.result,
-				filename: file.name.substr(0, 20),
+//				filename: file.name.substr(0, 20),
 				score: $('#score').val(),
 				database: $('#database').val(),
 			}, (res) => {

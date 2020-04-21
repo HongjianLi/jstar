@@ -18,9 +18,63 @@ const cluster = require('cluster');
 		const databases = [{
 			name: 'WITHDRAWN',
 			numCompounds: 613,
+/*		}, {
+			name: 'EK-DRD',
+			numCompounds: 1870,
 		}, {
-			name: 'SuperDRUG2',
+			name: 'Biopurify',
+			numCompounds: 2103,
+		}, {
+			name: 'SuperDRUG',
 			numCompounds: 3864,
+		}, {
+			name: 'SWEETLEAD',
+			numCompounds: 4208,
+		}, {
+			name: 'HybridMolDB',
+			numCompounds: 4600,
+		}, {
+			name: 'TTD',
+			numCompounds: 5429,
+		}, {
+			name: 'PADFrag',
+			numCompounds: 5469,
+		}, {
+			name: 'TargetMol',
+			numCompounds: 5690,
+		}, {
+			name: 'Selleckchem',
+			numCompounds: 9930,
+		}, {
+			name: 'MedChemExpress',
+			numCompounds: 14458,
+		}, {
+			name: 'NPASS',
+			numCompounds: 29295,
+		}, {
+			name: 'Pfizer',
+			numCompounds: 105864,
+		}, {
+			name: 'SuperNatural',
+			numCompounds: 311682,
+		}, {
+			name: 'Specs',
+			numCompounds: 683539,
+		}, {
+			name: 'ChemDiv',
+			numCompounds: 1382874,
+		}, {
+			name: 'ChEMBL',
+			numCompounds: 1828196,
+		}, {
+			name: 'GDBMedChem',
+			numCompounds: 9904832,
+		}, {
+			name: 'SCUBIDOO',
+			numCompounds: 20899717,
+		}, {
+			name: 'ZINC',
+			numCompounds: 265450385,*/
 		}].map((db) => {
 			db.descriptors = descriptors.map((descriptor) => { // Create a deep copy by either Object.assign({}, descriptor) or JSON.parse(JSON.stringify(descriptors)). Cannot use descriptors.slice() or descriptors.concat() or [...descriptors] because of shallow copy.
 				return Object.assign({}, descriptor);
@@ -80,7 +134,8 @@ const cluster = require('cluster');
 	const mongodb = require('mongodb');
 	const mongoClient = await mongodb.MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true, useUnifiedTopology: true }); // poolSize is 5 by default.
 	const jstar = mongoClient.db('jstar');
-//	const jdock = jstar.collection('jdock');
+	const lbvs = jstar.collection('lbvs');
+//	const sbvs = jstar.collection('sbvs');
 	// Configure express server
 	const express = require('express');
 //	const compress = require('compression');
@@ -176,7 +231,66 @@ const cluster = require('cluster');
 			res.json(m2s);
 		});
 	});
-	// Start listening
+	app.route('/lbvs/job').get(async (req, res) => {
+/*		const v = new validator(req.query);
+		if (v
+			.field('id').message('must be a valid job ID').objectid().copy()
+			.failed()) {
+			res.json(v.err);
+			return;
+		};
+		const doc = await lbvs.findOne({_id: new mongodb.ObjectID(v.res.id)}, {
+			projection: {
+				'_id': 0,
+				'filename': 1,
+				'usr': 1,
+				'submitted': 1,
+				'started': 1,
+				'completed': 1,
+				'nqueries': 1,
+				'numConformers': 1,
+			},
+		});
+		res.json(doc);*/
+	}).post((req, res) => {
+/*		const v = new validator(req.body);
+		if (v
+			.field('filename').message('must be provided, at most 20 characters').length(1, 20).xss().copy()
+			.field('query').message('must be provided, at most 50KB').length(1, 50000)
+			.field('score').message('must be USR or USRCAT').int(0).min(0).max(1).copy()
+			.failed()) {
+			res.json(v.err);
+			return;
+		}*/
+		var validate = cp.spawn(__dirname + '/bin/validate');
+		var validate_out = Buffer.alloc(0);
+		validate.stdout.on('data', (data) => {
+			validate_out = Buffer.concat([validate_out, data]);
+		});
+		validate.on('close', (code, signal) => {
+			if (code) {
+				res.json(code);
+				return;
+			} else if (signal) {
+				res.json(signal);
+				return;
+			}
+			v.res.submitted = new Date();
+			v.res._id = new mongodb.ObjectID();
+			var dir = __dirname + '/public/jobs/' + v.res._id;
+			fs.mkdir(dir, (err) => {
+				if (err) throw err;
+				fs.writeFile(dir + '/query.sdf', validate_out.toString(), (err) => {
+					if (err) throw err;
+					lbvs.insertOne(v.res, { w: 0 });
+					res.json(v.res._id);
+				});
+			});
+		});
+		validate.stdin.write(req.body['query']);
+		validate.stdin.end();
+	});
+// Start listening
 	const http_port = 22080, spdy_port = 22443;
 	app.listen(http_port);
 /*	require('spdy').createServer(require('https').Server, {
