@@ -151,7 +151,7 @@ const cluster = require('cluster');
 	// Define helper variables and functions
 	const uuid = require('uuid');
 //	const validator = require('./public/validator');
-//	const child_process = require('child_process');
+	const child_process = require('child_process');
 	// Get the number of compounds satisfying filtering conditions
 	app.route('/jdata/count').get((req, res) => {
 		// Validate and sanitize user input
@@ -262,8 +262,8 @@ const cluster = require('cluster');
 			res.json(v.err);
 			return;
 		}*/
-		var validate = cp.spawn(__dirname + '/bin/validate');
-		var validate_out = Buffer.alloc(0);
+		const validate = child_process.spawn(__dirname + '/bin/validate');
+		const validate_out = Buffer.alloc(0);
 		validate.stdout.on('data', (data) => {
 			validate_out = Buffer.concat([validate_out, data]);
 		});
@@ -277,7 +277,7 @@ const cluster = require('cluster');
 			}
 			v.res.submitted = new Date();
 			v.res._id = new mongodb.ObjectID();
-			var dir = __dirname + '/public/jobs/' + v.res._id;
+			const dir = __dirname + '/public/jobs/' + v.res._id;
 			fs.mkdir(dir, (err) => {
 				if (err) throw err;
 				fs.writeFile(dir + '/query.sdf', validate_out.toString(), (err) => {
