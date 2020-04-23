@@ -31,6 +31,7 @@
 		"express": ">=4.17.0",
 		"mongodb": "^3.5.6",
 		"serve-favicon": ">=2.5.0",
+		"spdy": "^4.0.2",
 		"uuid": ">=7.0.0"
 	},
 	"main": "web.js",

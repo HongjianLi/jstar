@@ -290,12 +290,16 @@ const cluster = require('cluster');
 		validate.stdin.write(req.body['query']);
 		validate.stdin.end();
 	});
-// Start listening
-	const http_port = 22080, spdy_port = 22443;
-	app.listen(http_port);
-/*	require('spdy').createServer(require('https').Server, {
+	// Start listening
+	const https_port = 22443;
+	require('spdy').createServer({
 		key: fs.readFileSync(__dirname + '/key.pem'),
-		cert: fs.readFileSync(__dirname + '/cert.pem')
-	}, app).listen(spdy_port);*/
-	console.log('Worker %d listening on HTTP port %d and SPDY port %d in %s mode', process.pid, http_port, spdy_port, app.settings.env);
+		cert: fs.readFileSync(__dirname + '/cert.pem'),
+	}, app).listen(https_port, (err) => {
+		if (err) {
+			console.error(err);
+			return;
+		}
+		console.log('Worker %d listening on port %d in %s mode', process.pid, https_port, app.settings.env);
+	});
 })();
