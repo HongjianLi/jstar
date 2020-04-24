@@ -329,6 +329,53 @@ $(() => {
 			seriesData: [22630, 16999, 26166, 40101, 52077, 52349, 42001, 59359],
 		}],
 	},{
+		name: 'SureChEMBL',
+		link: 'https://www.surechembl.org/',
+		version: 'Q1 2019',
+		accessDate: '2020-04-17',
+		numCompounds: 286451,
+		descriptors: [{
+			name: 'natm',
+			min: 4,
+			max: 69,
+			seriesData: [43608, 13596, 13208, 14070, 15934, 18786, 19823, 147426],
+		}, {
+			name: 'nhbd',
+			min: 0,
+			max: 23,
+			seriesData: [82233, 86710, 64012, 30840, 13567, 4000, 2155, 2934],
+		}, {
+			name: 'nhba',
+			min: 0,
+			max: 31,
+			seriesData: [2541, 14477, 27697, 37544, 43118, 39748, 35667, 85659],
+		}, {
+			name: 'nrtb',
+			min: 0,
+			max: 57,
+			seriesData: [7063, 13853, 24442, 33461, 39034, 37778, 31660, 99160],
+		}, {
+			name: 'nrng',
+			min: 0,
+			max: 30,
+			seriesData: [12504, 29408, 42776, 48085, 55307, 41484, 20317, 36570],
+		}, {
+			name: 'xmwt',
+			min: 99,
+			max: 1575,
+			seriesData: [18676, 21326, 24317, 27344, 33900, 36967, 32300, 91621],
+		}, {
+			name: 'tpsa',
+			min: 0,
+			max: 553,
+			seriesData: [23991, 37904, 47643, 50728, 48417, 33910, 19921, 23937],
+		}, {
+			name: 'clgp',
+			min: -14,
+			max: 21,
+			seriesData: [3940, 5661, 13648, 29719, 48237, 54276, 44258, 86712],
+		}],
+	},{
 		name: 'Pfizer',
 		link: 'https://www.pfizer.com/',
 		version: '',
