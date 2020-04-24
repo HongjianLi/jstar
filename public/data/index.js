@@ -1029,6 +1029,7 @@ $(() => {
 		});
 		return db;
 	});
+	console.assert(parseInt($('#numDatabases').text()) === databases.length);
 	$('#dbTableBody tr').each((trIdx, tr) => {
 		const db = databases[trIdx];
 		$(tr).children().each((tdIdx, td) => {
