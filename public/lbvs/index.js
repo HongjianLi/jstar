@@ -11,9 +11,9 @@ $(() => {
 		reader.onload = () => {
 			$.post('job', {
 				query: reader.result,
-//				filename: file.name.substr(0, 20),
-				score: $('#score').val(),
+				name: file.name.substr(0, 20),
 				database: $('#database').val(),
+				score: $('#score').val(),
 			}, (res) => {
 				if (res.error) {
 					query_label.tooltip('show');
