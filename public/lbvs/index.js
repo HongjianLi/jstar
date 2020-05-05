@@ -15,7 +15,6 @@ $(() => {
 				database: $('#database').val(),
 				score: $('#score').val(),
 			}, (res) => {
-				console.log(res);
 				if (res.error) {
 					query_label.tooltip('dispose').attr('title', res.error).tooltip('show');
 					return;
