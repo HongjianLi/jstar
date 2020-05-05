@@ -376,6 +376,53 @@ $(() => {
 			seriesData: [3940, 5661, 13648, 29719, 48237, 54276, 44258, 86712],
 		}],
 	},{
+		name: 'COCONUT',
+		link: 'https://zenodo.org/record/3747531',
+		version: '3',
+		accessDate: '2020-04-11',
+		numCompounds: 198224,
+		descriptors: [{
+			name: 'natm',
+			min: 6,
+			max: 69,
+			seriesData: [23848, 9223, 10963, 14088, 16164, 16681, 16329, 90928],
+		}, {
+			name: 'nhbd',
+			min: 0,
+			max: 20,
+			seriesData: [38799, 50273, 41464, 22745, 13286, 8605, 7427, 15625],
+		}, {
+			name: 'nhba',
+			min: 0,
+			max: 35,
+			seriesData: [2319, 7933, 16325, 22701, 28841, 29507, 25258, 65340],
+		}, {
+			name: 'nrtb',
+			min: 0,
+			max: 59,
+			seriesData: [10241, 15260, 18663, 21442, 23507, 23055, 20283, 65773],
+		}, {
+			name: 'nrng',
+			min: 0,
+			max: 19,
+			seriesData: [10727, 17089, 29293, 41391, 43607, 26284, 13308, 16525],
+		}, {
+			name: 'xmwt',
+			min: 78,
+			max: 1626,
+			seriesData: [12027, 12230, 18207, 26970, 29819, 28869, 20503, 49599],
+		}, {
+			name: 'tpsa',
+			min: 0,
+			max: 621,
+			seriesData: [6337, 18452, 30996, 38231, 30388, 22028, 13556, 38236],
+		}, {
+			name: 'clgp',
+			min: -15,
+			max: 24,
+			seriesData: [12447, 10699, 18376, 27165, 34457, 32999, 24649, 37432],
+		}],
+	},{
 		name: 'Pfizer',
 		link: 'https://www.pfizer.com/',
 		version: '',
