@@ -150,8 +150,51 @@ const cluster = require('cluster');
 	app.use(favicon(__dirname + '/public/favicon.ico'));
 	// Define helper variables and functions
 	const uuid = require('uuid');
-//	const validator = require('./public/validator');
 	const child_process = require('child_process');
+	const Ajv = require('ajv');
+	const ajv = new Ajv(); // { coerceTypes: true }
+	const validate = {};
+	[{
+		name: '/lbvs/job/get',
+		schema: {
+			type: "object",
+			properties: {
+				id: {
+					type: "string",
+					minLength: 24,
+					maxLength: 24,
+				},
+			},
+		},
+	}, {
+		name: '/lbvs/job/post',
+		schema: {
+			type: "object",
+			properties: {
+				name: {
+					type: "string",
+					minLength: 1,
+					maxLength: 20,
+				},
+				query: {
+					type: "string",
+					minLength: 1,
+					maxLength: 50000,
+				},
+				database: {
+					type: "string",
+					enum: ["WITHDRAWN", "EK-DRD"],
+				},
+				score: {
+					type: "string",
+					enum: ["USR", "USRCAT"],
+				},
+			},
+			required: [ "name", "query", "database", "score" ],
+		},
+	}].forEach((ns) => {
+		validate[ns.name] = ajv.compile(ns.schema);
+	});
 	// Get the number of compounds satisfying filtering conditions
 	app.route('/data/count').get((req, res) => {
 		// Validate and sanitize user input
@@ -183,7 +226,7 @@ const cluster = require('cluster');
 		// Send query to master process
 		const s2mMsg = {
 			uuid: uuid.v4(), // Version 4 (random) - Created from cryptographically-strong random values. Version 1 (timestamp) - Created from the system clock (plus random values).
-			query: '/jdata/count',
+			query: '/data/count',
 			s2m: {
 				db: 'WITHDRAWN',
 				descriptors: [{ // natm
@@ -232,14 +275,19 @@ const cluster = require('cluster');
 		});
 	});
 	app.route('/lbvs/job').get(async (req, res) => {
-/*		const v = new validator(req.query);
-		if (v
-			.field('id').message('must be a valid job ID').objectid().copy()
-			.failed()) {
-			res.json(v.err);
+		const reqDoc = {};
+		['id'].forEach((key) => {
+			reqDoc[key] = req.query[key];
+		});
+		if (!validate['/lbvs/job/get'](reqDoc)) {
+			res.json({
+				error: validate['/lbvs/job/get'].errors,
+			});
 			return;
-		};
-		const doc = await lbvs.findOne({_id: new mongodb.ObjectID(v.res.id)}, {
+		}
+		const resDoc = await lbvs.findOne({
+			_id: new mongodb.ObjectID(reqDoc.id),
+		}, {
 			projection: {
 				'_id': 0,
 				'name': 1,
@@ -252,30 +300,24 @@ const cluster = require('cluster');
 				'numConformers': 1,
 			},
 		});
-		res.json(doc);*/
+		res.json(resDoc);
 	}).post((req, res) => {
-/*		const v = new validator(req.body);
-		if (v
-			.field('name').message('must be provided, at most 20 characters').length(1, 20).xss().copy()
-			.field('query').message('must be provided, at most 50KB').length(1, 50000)
-			.field('database').message('must be one of the screening databases').xss().copy()
-			.field('score').message('must be USR or USRCAT').int(0).min(0).max(1).copy()
-			.failed()) {
-			res.json(v.err);
-			return;
-		}*/
-		const v = {
-			res: {},
-		};
+		const reqDoc = {};
 		['name', 'query', 'database', 'score'].forEach((key) => {
-			v.res[key] = req.body[key];
+			reqDoc[key] = req.body[key];
 		});
-		const validate = child_process.spawn(__dirname + '/bin/validate');
+		if (!validate['/lbvs/job/post'](reqDoc)) {
+			res.json({
+				error: validate['/lbvs/job/post'].errors,
+			});
+			return;
+		}
+		const validateProc = child_process.spawn(__dirname + '/bin/validate');
 		let validateStdout = Buffer.alloc(0);
-		validate.stdout.on('data', (data) => {
+		validateProc.stdout.on('data', (data) => {
 			validateStdout = Buffer.concat([validateStdout, data]);
 		});
-		validate.on('close', (code, signal) => {
+		validateProc.on('close', (code, signal) => {
 			if (code || signal) {
 				res.json({
 					code,
@@ -284,23 +326,23 @@ const cluster = require('cluster');
 				});
 				return;
 			}
-			v.res.submitted = new Date();
-			v.res._id = new mongodb.ObjectID();
-			const dir = __dirname + '/public/lbvs/job/' + v.res._id;
+			reqDoc.submitDate = new Date();
+			reqDoc._id = new mongodb.ObjectID();
+			const dir = __dirname + '/public/lbvs/job/' + reqDoc._id;
 			fs.mkdir(dir, (err) => {
 				if (err) throw err;
 				fs.writeFile(dir + '/query.sdf', validateStdout.toString(), (err) => {
 					if (err) throw err;
-					lbvs.insertOne(v.res);
+					lbvs.insertOne(reqDoc);
 					res.json({
-						id: v.res._id,
+						id: reqDoc._id,
 						message: 'LBVS job created',
 					});
 				});
 			});
 		});
-		validate.stdin.write(req.body['query']);
-		validate.stdin.end();
+		validateProc.stdin.write(reqDoc['query']);
+		validateProc.stdin.end();
 	});
 	// Start listening
 	const https_port = 22443;
