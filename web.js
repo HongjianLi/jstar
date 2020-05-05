@@ -95,7 +95,7 @@ const cluster = require('cluster');
 		const numWorkerProcesses = 4;
 		console.log('Forking %d worker processes', numWorkerProcesses);
 		function messageHandler (msg) { // Cannot use lambda function => because of 'this' binding. The 'this.send()' statement requires capturing the worker process.
-			if (msg.query === '/jdata/count') {
+			if (msg.query === '/data/count') {
 				const { s2m } = msg; // slave to master.
 				const db = databases.find((db) => {
 					return db.name === s2m.db;
@@ -139,12 +139,12 @@ const cluster = require('cluster');
 	// Configure express server
 	const express = require('express');
 //	const compress = require('compression');
-//	const bodyParser = require('body-parser');
+	const bodyParser = require('body-parser');
 	const favicon = require('serve-favicon');
 	const errorHandler = require('errorhandler');
 	const app = express();
 //	app.use(compress());
-//	app.use(bodyParser.urlencoded({ limit: '12mb', extended: false }));
+	app.use(bodyParser.urlencoded({ limit: '60kb', extended: false }));
 	app.use(errorHandler({ dumpExceptions: true, showStack: true }));
 	app.use(express.static(__dirname + '/public'));
 	app.use(favicon(__dirname + '/public/favicon.ico'));
@@ -153,7 +153,7 @@ const cluster = require('cluster');
 //	const validator = require('./public/validator');
 	const child_process = require('child_process');
 	// Get the number of compounds satisfying filtering conditions
-	app.route('/jdata/count').get((req, res) => {
+	app.route('/data/count').get((req, res) => {
 		// Validate and sanitize user input
 /*		let v = new validator(req.query);
 		if (v
@@ -242,12 +242,13 @@ const cluster = require('cluster');
 		const doc = await lbvs.findOne({_id: new mongodb.ObjectID(v.res.id)}, {
 			projection: {
 				'_id': 0,
-				'filename': 1,
-				'usr': 1,
-				'submitted': 1,
-				'started': 1,
-				'completed': 1,
-				'nqueries': 1,
+				'name': 1,
+				'database': 1,
+				'score': 1,
+				'submitDate': 1,
+				'startDate': 1,
+				'endDate': 1,
+				'numQueries': 1,
 				'numConformers': 1,
 			},
 		});
@@ -255,35 +256,46 @@ const cluster = require('cluster');
 	}).post((req, res) => {
 /*		const v = new validator(req.body);
 		if (v
-			.field('filename').message('must be provided, at most 20 characters').length(1, 20).xss().copy()
+			.field('name').message('must be provided, at most 20 characters').length(1, 20).xss().copy()
 			.field('query').message('must be provided, at most 50KB').length(1, 50000)
+			.field('database').message('must be one of the screening databases').xss().copy()
 			.field('score').message('must be USR or USRCAT').int(0).min(0).max(1).copy()
 			.failed()) {
 			res.json(v.err);
 			return;
 		}*/
+		const v = {
+			res: {},
+		};
+		['name', 'query', 'database', 'score'].forEach((key) => {
+			v.res[key] = req.body[key];
+		});
 		const validate = child_process.spawn(__dirname + '/bin/validate');
-		const validate_out = Buffer.alloc(0);
+		let validateStdout = Buffer.alloc(0);
 		validate.stdout.on('data', (data) => {
-			validate_out = Buffer.concat([validate_out, data]);
+			validateStdout = Buffer.concat([validateStdout, data]);
 		});
 		validate.on('close', (code, signal) => {
-			if (code) {
-				res.json(code);
-				return;
-			} else if (signal) {
-				res.json(signal);
+			if (code || signal) {
+				res.json({
+					code,
+					signal,
+					error: 'Unsupported SDF file',
+				});
 				return;
 			}
 			v.res.submitted = new Date();
 			v.res._id = new mongodb.ObjectID();
-			const dir = __dirname + '/public/jobs/' + v.res._id;
+			const dir = __dirname + '/public/lbvs/job/' + v.res._id;
 			fs.mkdir(dir, (err) => {
 				if (err) throw err;
-				fs.writeFile(dir + '/query.sdf', validate_out.toString(), (err) => {
+				fs.writeFile(dir + '/query.sdf', validateStdout.toString(), (err) => {
 					if (err) throw err;
-					lbvs.insertOne(v.res, { w: 0 });
-					res.json(v.res._id);
+					lbvs.insertOne(v.res);
+					res.json({
+						id: v.res._id,
+						message: 'LBVS job created',
+					});
 				});
 			});
 		});
