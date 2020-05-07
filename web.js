@@ -171,26 +171,26 @@ const cluster = require('cluster');
 		schema: {
 			type: "object",
 			properties: {
-				name: {
+				filename: {
 					type: "string",
 					minLength: 1,
 					maxLength: 20,
 				},
-				query: {
+				qrySdf: { // Caution NoSQL injection
 					type: "string",
 					minLength: 1,
 					maxLength: 50000,
 				},
 				database: {
 					type: "string",
-					enum: ["WITHDRAWN", "EK-DRD"],
+					enum: ["WITHDRAWN", "EK-DRD", "SuperDRUG", "Selleckchem"],
 				},
 				score: {
 					type: "string",
 					enum: ["USR", "USRCAT"],
 				},
 			},
-			required: [ "name", "query", "database", "score" ],
+			required: [ "filename", "qrySdf", "database", "score" ],
 		},
 	}].forEach((ns) => {
 		validate[ns.name] = ajv.compile(ns.schema);
@@ -290,12 +290,15 @@ const cluster = require('cluster');
 		}, {
 			projection: {
 				'_id': 0,
-				'name': 1,
+				'filename': 1,
+				'qrySdf': 1,
 				'database': 1,
 				'score': 1,
 				'submitDate': 1,
 				'startDate': 1,
 				'endDate': 1,
+				'hitSdf': 1,
+				'hitCsv': 1,
 				'numQueries': 1,
 				'numConformers': 1,
 			},
@@ -303,7 +306,7 @@ const cluster = require('cluster');
 		res.json(resDoc);
 	}).post((req, res) => {
 		const reqDoc = {};
-		['name', 'query', 'database', 'score'].forEach((key) => {
+		['filename', 'qrySdf', 'database', 'score'].forEach((key) => {
 			reqDoc[key] = req.body[key];
 		});
 		if (!validate['/lbvs/job/post'](reqDoc)) {
@@ -326,22 +329,17 @@ const cluster = require('cluster');
 				});
 				return;
 			}
+			reqDoc.qrySdf = validateStdout.toString();
 			reqDoc.submitDate = new Date();
-			reqDoc._id = new mongodb.ObjectID();
-			const dir = __dirname + '/public/lbvs/job/' + reqDoc._id;
-			fs.mkdir(dir, (err) => {
-				if (err) throw err;
-				fs.writeFile(dir + '/query.sdf', validateStdout.toString(), (err) => {
-					if (err) throw err;
-					lbvs.insertOne(reqDoc);
-					res.json({
-						id: reqDoc._id,
-						message: 'LBVS job created',
-					});
+			lbvs.insertOne(reqDoc, (err, cmdRes) => {
+				assert.equal(cmdRes.insertedCount, 1);
+				res.json({
+					id: cmdRes.insertedId,
+					message: 'LBVS job created',
 				});
 			});
 		});
-		validateProc.stdin.write(reqDoc['query']);
+		validateProc.stdin.write(reqDoc['qrySdf']);
 		validateProc.stdin.end();
 	});
 	// Start listening
