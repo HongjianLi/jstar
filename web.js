@@ -183,7 +183,7 @@ const cluster = require('cluster');
 					minLength: 1,
 					maxLength: 20,
 				},
-				qrySdf: { // Caution NoSQL injection
+				qryMolSdf: { // Caution NoSQL injection
 					type: 'string',
 					minLength: 1,
 					maxLength: 50000,
@@ -197,7 +197,7 @@ const cluster = require('cluster');
 					enum: ['USR', 'USRCAT'],
 				},
 			},
-			required: [ 'filename', 'qrySdf', 'database', 'score' ],
+			required: [ 'filename', 'qryMolSdf', 'database', 'score' ],
 		},
 	}].forEach((ns) => {
 		validate[ns.name] = ajv.compile(ns.schema);
@@ -298,14 +298,14 @@ const cluster = require('cluster');
 			projection: {
 				'_id': 0,
 				'filename': 1,
-				'qrySdf': 1,
+				'qryMolSdf': 1,
 				'database': 1,
 				'score': 1,
 				'submitDate': 1,
 				'startDate': 1,
 				'endDate': 1,
-				'hitSdf': 1,
-				'hitCsv': 1,
+				'hitMolSdf': 1,
+				'hitMolCsv': 1,
 				'numQueries': 1,
 				'numConformers': 1,
 			},
@@ -313,7 +313,7 @@ const cluster = require('cluster');
 		res.json(resDoc);
 	}).post((req, res) => {
 		const reqDoc = {};
-		['filename', 'qrySdf', 'database', 'score'].forEach((key) => {
+		['filename', 'qryMolSdf', 'database', 'score'].forEach((key) => {
 			reqDoc[key] = req.body[key];
 		});
 		if (!validate['/lbvs/job/post'](reqDoc)) {
@@ -353,7 +353,7 @@ const cluster = require('cluster');
 					}, {}],
 				}, {}];
 			}*/
-			reqDoc.qrySdf = validateStdout.toString();
+			reqDoc.qryMolSdf = validateStdout.toString();
 			reqDoc.submitDate = new Date();
 			lbvs.insertOne(reqDoc, (err, cmdRes) => {
 				assert.equal(cmdRes.insertedCount, 1);
@@ -363,7 +363,7 @@ const cluster = require('cluster');
 				});
 			});
 		});
-		validateProc.stdin.write(reqDoc['qrySdf']);
+		validateProc.stdin.write(reqDoc['qryMolSdf']);
 		validateProc.stdin.end();
 	});
 	// Start listening
