@@ -37,8 +37,8 @@
 			<h4>Run a virtual screen</h4>
 			<div class="row" role="form">
 				<div class="col-4 form-group">
-					<label for="query"><a data-toggle="tooltip" id="query_label">1) Select a query compound in 3D SDF format</a></label>
-					<input type="file" id="query">
+					<label for="qryMolSdf"><a data-toggle="tooltip" id="qryMolSdfLabel">1) Select a query compound in 3D SDF format</a></label>
+					<input type="file" class="btn btn-primary" id="qryMolSdf">
 				</div>
 				<div class="col-3 form-group">
 					<label for="database">2) Select a database to screen</label>
@@ -67,7 +67,7 @@
 						<option>WITHDRAWN</option>
 					</select>
 				</div>
-                <div class="col-3 form-group">
+				<div class="col-3 form-group">
 					<label for="score">3) Select a score to rank compounds</label>
 					<select class="form-control btn-primary" id="score">
 						<option>USR</option>
