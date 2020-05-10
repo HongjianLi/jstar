@@ -1,0 +1,202 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="author" content="Hongjian Li">
+	<meta name="description" content="jstar: a modern website for hosting drug discovery services">
+	<title>jstar: drug discovery services</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@4.4.1/dist/darkly/bootstrap.min.css" integrity="sha256-WzKrnqJMmUZVHL8Im0hFLIOJ3UiQtgwK7zNfwxb5Bx0=" crossorigin="anonymous">
+	<link rel="stylesheet" href="/index.css">
+	<link rel="icon" href="/favicon.ico">
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-125619081-1"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+		gtag('config', 'UA-125619081-1');
+	</script>
+	<script>
+		(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+		m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+		(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+		ym(55333216, "init", {
+			clickmap:true,
+			trackLinks:true,
+			accurateTrackBounce:true,
+		});
+	</script>
+</head>
+<body>
+	<header class="jumbotron text-center">
+		<a href="https://github.com/HongjianLi/jstar" class="ribbon"></a>
+		<h3><img src="/logo.svg" alt="logo"><strong>jstar</strong></h3>
+	</header>
+	<main class="container">
+		<section>
+			<div class="table-responsive">
+				<table class="table table-dark table-hover text-center">
+					<thead>
+						<tr>
+							<th scope="col">Query file</th>
+							<th scope="col">Database</th>
+							<th scope="col">Score</th>
+							<th scope="col">Submit time</th>
+							<th scope="col">Status</th>
+							<th scope="col">Start time</th>
+							<th scope="col">End time</th>
+							<th scope="col">Runtime</th>
+						</tr>
+					</thead>
+					<tbody id="status">
+						<tr>
+							<th scope="row"><a href=""><span id="filename"></span></a></th>
+							<td><span id="database"></span></td>
+							<td><span id="score"></span></td>
+							<td><span id="submitTime"></span></td>
+							<td><span id="status"></span></td>
+							<td><span id="startTime"></span></td>
+							<td><span id="endTime"></span></td>
+							<td><span id="runtime"></span></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="row">
+				<div class="col-lg-12">
+					<div id="gaugeScreeningSpeed" style="height: 400px;"></div>
+				</div>
+			</div>
+		</section>
+		<section id="results">
+			<div class="row">
+				<div class="col-lg-6">
+					<canvas id="qryMolCanvas2D"></canvas>
+				</div>
+				<div class="col-lg-6">
+					<canvas id="hitMolCanvas2D"></canvas>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-6">
+					<canvas id="qryMolCanvas3D"></canvas>
+				</div>
+				<div class="col-lg-6">
+					<canvas id="hitMolCanvas3D"></canvas>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-5">
+					<div class="form-group">
+						<label for="qryMolIds"><span id="qryMolIdsLabel"></span></label>
+						<div>
+							<div class="btn-group btn-group-sm" data-toggle="buttons" id="qryMolIds"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-1">
+					<div class="form-group">
+						<label>PNG</label>
+						<div>
+							<button class="btn btn-primary btn-sm" id="qryMolExport">Export</button>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-5">
+					<div class="form-group">
+						<label for="hitMolIds"><span id="hitMolIdsLabel"></span></label>
+						<div>
+							<div class="btn-group btn-group-sm btn-group-x" data-toggle="buttons" id="hitMolIds" role="group" aria-label="Button group of hit molecules"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-1">
+					<div class="form-group">
+						<label>PNG</label>
+						<div>
+							<button class="btn btn-primary btn-sm" id="hitMolExport">Export</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-4" id="qryMolProperties">
+					<p>The selected query molecule</p>
+					<ul>
+						<li>ID: <span id="id"></span></li>
+						<li>Canonical SMILES: <span id="canonicalSMILES"></span></li>
+						<li>Molecular formula: <span id="molFormula"></span></li>
+						<li>Heavy atoms: <span id="numAtoms"></span></li>
+						<li>Molecular weight (g/mol): <span id="exactMW"></span></li>
+						<li>Partition coefficient clogP: <span id="clogP"></span></li>
+						<li>Rotatable bonds: <span id="numRotatableBonds"></span></li>
+						<li>Rings: <span id="numRings"></span></li>
+						<li>Hydrogen bond donors: <span id="numHBD"></span></li>
+						<li>Hydrogen bond acceptors: <span id="numHBA"></span></li>
+						<li>Polar surface area tPSA (&Aring;<sup>2</sup>): <span id="tPSA"></span></li>
+					</ul>
+				</div>
+				<div class="col-lg-4" id="hitMolScores">
+					<p>Similarities of the hit molecule to the query molecule</p>
+					<ul>
+						<li>USR score: <span id="usr_score"></span></li>
+						<li>USRCAT score: <span id="usrcat_score"></span></li>
+						<li>Tanimoto score: <span id="tanimoto_score"></span></li>
+					</ul>
+				</div>
+				<div class="col-lg-4" id="hitMolProperties">
+					<p>The selected hit molecule</p>
+					<ul>
+						<li>ID: <a target="_blank"><span id="id"></span></a></li>
+						<li>Canonical SMILES: <span id="canonicalSMILES"></span></li>
+						<li>Molecular formula: <span id="molFormula"></span></li>
+						<li>Heavy atoms: <span id="numAtoms"></span></li>
+						<li>Molecular weight (g/mol): <span id="exactMW"></span></li>
+						<li>Partition coefficient clogP: <span id="clogP"></span></li>
+						<li>Rotatable bonds: <span id="numRotatableBonds"></span></li>
+						<li>Rings: <span id="numRings"></span></li>
+						<li>Hydrogen bond donors: <span id="numHBD"></span></li>
+						<li>Hydrogen bond acceptors: <span id="numHBA"></span></li>
+						<li>Polar surface area tPSA (&Aring;<sup>2</sup>): <span id="tPSA"></span></li>
+					</ul>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-6">
+					<p>Keyings</p>
+					<ul>
+						<li>Default: rotate</li>
+						<li>Ctrl: translate</li>
+						<li>Shift: zoom in/out</li>
+						<li>Ctrl + shift: slab</li>
+					</ul>
+				</div>
+				<div class="col-lg-6">
+					<p>Hit molecules for download</p>
+					<ul id="downloads">
+						<li><a>hits.csv</a></li>
+						<li><a>hits.sdf</a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-12">
+					<p class="text-center">Hongjian Li, Kwong-Sak Leung, Takanori Nakane and Man-Hon Wong. iview: an interactive WebGL visualizer for protein-ligand complex. <em>BMC Bioinformatics</em>, 15(1):56, 2014. <a href="http://doi.org/10.1186/1471-2105-15-56">DOI: 10.1186/1471-2105-15-56</a></p>
+				</div>
+			</div>
+		</section>
+	</main>
+	<footer>
+		<p>&copy; 2020 Chinese University of Hong Kong. Platform designed by <a href="https://github.com/HongjianLi">Hongjian Li</a>. Web pages conform to <a href="https://validator.w3.org/check?uri=referer">HTML5</a>.</p>
+	</footer>
+	<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha256-/ijcOLwFf26xEYAjW75FizKVo5tnTYiQddPZoLUHHZ8=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha256-WqU1JavFxSAMcLP2WIOI+GB2zWmShMI82mTpLDcqFUg=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/jquery-dateformat@1.0.4/dist/jquery-dateformat.min.js" integrity="sha256-q/gsMMfcN0l21f3LBhKI8aOb4f9j5WmuvO9Kxmjjy2g=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/echarts@4.7.0/dist/echarts-en.min.js" integrity="sha256-QkdCItp01Ss8Jds8pNZdt+RnerMB/Iy48EIR8hLwC34=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/three@0.116.1/build/three.min.js" integrity="sha256-xJj9x8gbL9ENxfyA7xT9xNm/EbK5GWl4bdSqhbS2iWY=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/smiles-drawer@1.2.0/dist/smiles-drawer.min.js" integrity="sha256-xwUPmrnpnwABJ3oEm1I7+0V5GerXl8n1Sp1oNGTO0yU=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.2/dist/FileSaver.min.js" integrity="sha256-u/J1Urdrk3nCYFefpoeTMgI5viU1ujCDu2fXXoSJjhg=" crossorigin="anonymous"></script>
+	<script src="index.js"></script>
+</body>
+</html>

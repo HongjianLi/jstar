@@ -52,3 +52,17 @@ footer {
 	width: 100%;
 	height: 250px;
 }
+
+canvas {
+	width: 100%;
+	background: #000000;
+}
+
+.btn-group {
+	display: inherit;
+}
+
+.btn-group-x {
+	overflow-x: scroll;
+	white-space: nowrap;
+}
