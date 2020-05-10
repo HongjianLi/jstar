@@ -55,6 +55,12 @@ const cluster = require('cluster');
 			name: 'Pfizer',
 			numCompounds: 105864,
 		}, {
+			name: 'COCONUT',
+			numCompounds: 198224,
+		}, {
+			name: 'SureChEMBL',
+			numCompounds: 286451,
+		}, {
 			name: 'SuperNatural',
 			numCompounds: 311682,
 		}, {
@@ -157,40 +163,41 @@ const cluster = require('cluster');
 	[{
 		name: '/lbvs/job/get',
 		schema: {
-			type: "object",
+			type: 'object',
 			properties: {
 				id: {
-					type: "string",
+					type: 'string',
 					minLength: 24,
 					maxLength: 24,
 				},
 			},
+			required: [ 'id' ],
 		},
 	}, {
 		name: '/lbvs/job/post',
 		schema: {
-			type: "object",
+			type: 'object',
 			properties: {
 				filename: {
-					type: "string",
+					type: 'string',
 					minLength: 1,
 					maxLength: 20,
 				},
 				qrySdf: { // Caution NoSQL injection
-					type: "string",
+					type: 'string',
 					minLength: 1,
 					maxLength: 50000,
 				},
 				database: {
-					type: "string",
-					enum: ["WITHDRAWN", "EK-DRD", "SuperDRUG", "Selleckchem"],
+					type: 'string',
+					enum: ['ZINC', 'SCUBIDOO', 'GDBMedChem', 'ChEMBL', 'ChemDiv', 'Specs', 'SuperNatural', 'SureChEMBL', 'COCONUT', 'Pfizer', 'NPASS', 'MedChemExpress', 'Selleckchem', 'TargetMol', 'PADFrag', 'TTD', 'HybridMolDB', 'SWEETLEAD', 'SuperDRUG', 'Biopurify', 'EK-DRD', 'WITHDRAWN'],
 				},
 				score: {
-					type: "string",
-					enum: ["USR", "USRCAT"],
+					type: 'string',
+					enum: ['USR', 'USRCAT'],
 				},
 			},
-			required: [ "filename", "qrySdf", "database", "score" ],
+			required: [ 'filename', 'qrySdf', 'database', 'score' ],
 		},
 	}].forEach((ns) => {
 		validate[ns.name] = ajv.compile(ns.schema);
@@ -253,7 +260,7 @@ const cluster = require('cluster');
 				}, { // clgp
 					lb: -9,
 					ub: 12,
-				}]
+				}],
 			},
 		};
 		process.send(s2mMsg, async (err) => { // The optional callback is a function that is invoked after the message is sent but before the master may have received it. The function is called with a single argument: null on success, or an Error object on failure.
