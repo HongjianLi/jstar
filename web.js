@@ -336,6 +336,23 @@ const cluster = require('cluster');
 				});
 				return;
 			}
+/*			{
+				database: '',
+				score: '',
+				createDate: '',
+				molecules: [{
+					qryMol: {
+						sdf: '',
+					},
+					hitMol: [{
+						id: '',
+						sdf: '',
+						SMILES: '',
+						natm: '',
+						tpsa: '',
+					}, {}],
+				}, {}];
+			}*/
 			reqDoc.qrySdf = validateStdout.toString();
 			reqDoc.submitDate = new Date();
 			lbvs.insertOne(reqDoc, (err, cmdRes) => {
