@@ -43,6 +43,9 @@ const cluster = require('cluster');
 			name: 'TargetMol',
 			numCompounds: 5690,
 		}, {
+			name: 'GtoPdb',
+			numCompounds: 7517,
+		}, {
 			name: 'Selleckchem',
 			numCompounds: 9930,
 		}, {
@@ -190,7 +193,7 @@ const cluster = require('cluster');
 				},
 				database: {
 					type: 'string',
-					enum: ['ZINC', 'SCUBIDOO', 'GDBMedChem', 'ChEMBL', 'ChemDiv', 'Specs', 'SuperNatural', 'SureChEMBL', 'COCONUT', 'Pfizer', 'NPASS', 'MedChemExpress', 'Selleckchem', 'TargetMol', 'PADFrag', 'TTD', 'HybridMolDB', 'SWEETLEAD', 'SuperDRUG', 'Biopurify', 'EK-DRD', 'WITHDRAWN'],
+					enum: ['ZINC', 'SCUBIDOO', 'GDBMedChem', 'ChEMBL', 'ChemDiv', 'Specs', 'SuperNatural', 'SureChEMBL', 'COCONUT', 'Pfizer', 'NPASS', 'MedChemExpress', 'Selleckchem', 'GtoPdb', 'TargetMol', 'PADFrag', 'TTD', 'HybridMolDB', 'SWEETLEAD', 'SuperDRUG', 'Biopurify', 'EK-DRD', 'WITHDRAWN'],
 				},
 				score: {
 					type: 'string',

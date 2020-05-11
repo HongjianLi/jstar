@@ -611,6 +611,53 @@ $(() => {
 			seriesData: [613, 368, 825, 1592, 1967, 2139, 1575, 851],
 		}],
 	},{
+		name: 'GtoPdb',
+		link: 'https://www.guidetopharmacology.org',
+		version: '2020.2',
+		accessDate: '2020-05-05',
+		numCompounds: 7517,
+		descriptors: [{
+			name: 'natm',
+			min: 3,
+			max: 69,
+			seriesData: [1097, 332, 508, 556, 652, 705, 719, 2948],
+		}, {
+			name: 'nhbd',
+			min: 0,
+			max: 14,
+			seriesData: [1083, 2257, 2031, 1124, 507, 205, 111, 199],
+		}, {
+			name: 'nhba',
+			min: 0,
+			max: 32,
+			seriesData: [20, 265, 861, 1203, 1296, 1176, 919, 1777],
+		}, {
+			name: 'nrtb',
+			min: 0,
+			max: 40,
+			seriesData: [251, 423, 755, 829, 919, 868, 794, 2678],
+		}, {
+			name: 'nrng',
+			min: 0,
+			max: 13,
+			seriesData: [478, 698, 1098, 1808, 1964, 985, 311, 175],
+		}, {
+			name: 'xmwt',
+			min: 44,
+			max: 1140,
+			seriesData: [598, 476, 719, 1030, 1252, 1189, 867, 1386],
+		}, {
+			name: 'tpsa',
+			min: 0,
+			max: 556,
+			seriesData: [227, 776, 1343, 1568, 1357, 970, 516, 760],
+		}, {
+			name: 'clgp',
+			min: -10,
+			max: 12,
+			seriesData: [386, 295, 451, 729, 1252, 1655, 1350, 1399],
+		}],
+	},{
 		name: 'TargetMol',
 		link: 'https://www.targetmol.com/',
 		version: '',
