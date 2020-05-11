@@ -1,22 +1,22 @@
 $(() => {
 	const databases = [{
 		name: 'ZINC',
-		cmpdLink: 'https://zinc15.docking.org/substances/${id}/',
+		cmpdLink: 'https://zinc15.docking.org/substances/{0}/',
 	}, {
 		name: 'SCUBIDOO',
-		cmpdLink: 'http://www.kolblab.org/scubidoo/controller/search_reactant.php?r1_id=${id}',
+		cmpdLink: 'http://www.kolblab.org/scubidoo/controller/search_reactant.php?r1_id={0}',
 	}, {
 		name: 'GDBMedChem',
 		cmpdLink: 'http://gdb.unibe.ch/downloads/',
 	}, {
 		name: 'ChEMBL',
-		cmpdLink: 'https://www.ebi.ac.uk/chembl/compound_report_card/${id}/',
+		cmpdLink: 'https://www.ebi.ac.uk/chembl/compound_report_card/{0}/',
 	}, {
 		name: 'ChemDiv',
-		cmpdLink: 'https://www.chemdiv.com/', // TODO multiple libraries, which one? molid present, which seems the real id. https://chemistryondemand.com:8443/eShop/compound_info.jsp?molid=4&saltdata=null&cid=J080-0005
+		cmpdLink: 'https://chemistryondemand.com:8443/eShop/search_results.jsp?idnumber={0}',
 	}, {
 		name: 'Specs',
-		cmpdLink: 'https://www.specs.net/index.php?page=search_show_structure&structureId=${id}&guest=Y',
+		cmpdLink: 'https://www.specs.net/index.php?page=search_show_structure&structureId={0}&guest=Y',
 	}, {
 		name: 'SuperNatural',
 		cmpdLink: 'http://bioinf-applied.charite.de/supernatural_new/index.php?site=compound_search',
@@ -31,25 +31,25 @@ $(() => {
 		cmpdLink: 'https://www.pfizer.com/',
 	}, {
 		name: 'NPASS',
-		cmpdLink: 'http://bidd2.nus.edu.sg/NPASS/compound.php?compoundID=${id}',
+		cmpdLink: 'http://bidd2.nus.edu.sg/NPASS/compound.php?compoundID={0}',
 	}, {
 		name: 'MedChemExpress',
-		cmpdLink: 'https://www.medchemexpress.com/search.html?q=${id}', // TODO failed to find HY-Z0823
+		cmpdLink: 'https://www.medchemexpress.com/search.html?q={0}',
 	}, {
 		name: 'Selleckchem',
-		cmpdLink: 'https://www.selleckchem.com/search.html?searchDTO.searchParam=${id}',
+		cmpdLink: 'https://www.selleckchem.com/search.html?searchDTO.searchParam={0}',
 	}, {
 		name: 'TargetMol',
 		cmpdLink: 'https://www.targetmol.com/',
 	}, {
 		name: 'PADFrag',
-		cmpdLink: 'http://chemyang.ccnu.edu.cn/ccb/database/PADFrag/index.php/fragment/more/FDBF04489',
+		cmpdLink: 'http://chemyang.ccnu.edu.cn/ccb/database/PADFrag/index.php/{1}/more/{0}',
 	}, {
 		name: 'TTD',
-		cmpdLink: 'http://db.idrblab.net/ttd/data/drug/details/${id}',
+		cmpdLink: 'http://db.idrblab.net/ttd/data/drug/details/{0}',
 	}, {
 		name: 'HybridMolDB',
-		cmpdLink: 'http://www.idruglab.com/HybridMolDB/compoundDetail.php?compoundid=${id}',
+		cmpdLink: 'http://www.idruglab.com/HybridMolDB/compoundDetail.php?compoundid={0}',
 	}, {
 		name: 'SWEETLEAD',
 		cmpdLink: 'https://simtk.org/projects/sweetlead',
@@ -58,14 +58,19 @@ $(() => {
 		cmpdLink: 'http://cheminfo.charite.de/superdrug2/drug_search.html',
 	}, {
 		name: 'Biopurify',
-		cmpdLink: 'http://www.biopurify.com/',
+		cmpdLink: 'http://www.biopurify.com/', // http://chem960.vicp.cc:9106/search.do?a=s&searchtype=1&psize=10&q=BP0013&searchtmp=simplesearch&t=-1 seems broken
 	}, {
 		name: 'EK-DRD',
-		cmpdLink: 'http://www.idruglab.com/drd/drugDetail.php?drugid=${id}',
+		cmpdLink: 'http://www.idruglab.com/drd/drugDetail.php?drugid={0}',
 	}, {
 		name: 'WITHDRAWN',
 		cmpdLink: 'http://cheminfo.charite.de/withdrawn/drug_search.html',
 	}];
+	String.prototype.format = function() {
+		return this.replace(/\{(\d+)\}/g, (m, i) => { // Lambda function inherits 'this' binding from its enclosing function.
+			return arguments[i]; // The arguments variable is from the String.prototype.format, not from the anonymous lambda function.
+		});
+	}
 	const tick = (jobIdVal) => {
 		$.get('/lbvs/job', { id: jobIdVal }, (job) => {
 			console.log(job);
@@ -478,7 +483,7 @@ $(() => {
 						const prop = t.attr('id');
 						t.text(hitMol[prop]); // TODO parseFloat() before toFixed().
 					});
-					$('#hitMolProperties #id').parent().attr('href', cpdb.cmpdLink.replace(/\$\{id\}/g, hitMol.id));
+					$('#hitMolProperties #id').parent().attr('href', cpdb.cmpdLink.format(hitMol.id, cpdb.name === 'PADFrag' ? ['drug', 'fragment'][+(hitMol.id.charAt(3) === 'F')] : undefined));
 					if (!hitMol['canonicalSmilesTree']) {
 						SmilesDrawer.parse(hitMol['canonicalSMILES'], (hitMolSmilesTree) => { // SmilesDrawer.parse() is a static function.
 							hitMol['canonicalSmilesTree'] = hitMolSmilesTree;
