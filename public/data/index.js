@@ -611,6 +611,53 @@ $(() => {
 			seriesData: [613, 368, 825, 1592, 1967, 2139, 1575, 851],
 		}],
 	},{
+		name: 'DrugBank',
+		link: 'https://www.drugbank.ca/',
+		version: '5.1.6',
+		accessDate: '2020-05-10',
+		numCompounds: 8802,
+		descriptors: [{
+			name: 'natm',
+			min: 3,
+			max: 50,
+			seriesData: [2558, 616, 758, 785, 698, 696, 705, 1986],
+		}, {
+			name: 'nhbd',
+			min: 0,
+			max: 16,
+			seriesData: [1215, 2365, 2314, 1345, 750, 343, 206, 264],
+		}, {
+			name: 'nhba',
+			min: 0,
+			max: 23,
+			seriesData: [69, 460, 1224, 1480, 1450, 1245, 1033, 1841],
+		}, {
+			name: 'nrtb',
+			min: 0,
+			max: 15,
+			seriesData: [548, 701, 1061, 1120, 1164, 1022, 912, 2274],
+		}, {
+			name: 'nrng',
+			min: 0,
+			max: 11,
+			seriesData: [950, 1435, 1886, 2073, 1554, 654, 180, 70],
+		}, {
+			name: 'xmwt',
+			min: 41,
+			max: 1269,
+			seriesData: [1468, 938, 1232, 1346, 1287, 1066, 680, 785],
+		}, {
+			name: 'tpsa',
+			min: 0,
+			max: 411,
+			seriesData: [378, 1015, 1433, 1614, 1600, 1185, 564, 1013],
+		}, {
+			name: 'clgp',
+			min: -10,
+			max: 13,
+			seriesData: [1020, 628, 947, 1301, 1517, 1521, 1087, 781],
+		}],
+	},{
 		name: 'GtoPdb',
 		link: 'https://www.guidetopharmacology.org',
 		version: '2020.2',

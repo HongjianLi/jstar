@@ -39,6 +39,9 @@ $(() => {
 		name: 'Selleckchem',
 		cmpdLink: 'https://www.selleckchem.com/search.html?searchDTO.searchParam={0}',
 	}, {
+		name: 'DrugBank',
+		cmpdLink: 'https://www.drugbank.ca/drugs/{0}',
+	}, {
 		name: 'GtoPdb',
 		cmpdLink: 'https://www.guidetopharmacology.org/GRAC/LigandDisplayForward?ligandId={0}',
 	}, {
