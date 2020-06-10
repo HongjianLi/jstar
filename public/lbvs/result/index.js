@@ -440,9 +440,12 @@ $(() => {
 				const qryMol = qryMolecules[qryMolIdx = qryMolIdxClicked];
 				refreshMolecule(qryMol, iviews[0]);
 				$('#downloads a').each(function () { // 'this' binding is used.
-					const t = $(this);
-//					t.attr('href', 'job/' + jobIdVal + '/' + qryMolIdx + '/' + t.text());
-					// TODO reconstruct hits.sdf and hits.csv from the returned job object.
+					$(this).click((e) => {
+						e.preventDefault();
+						const text = e.target.text;
+						const bp = text === 'hits.sdf' ? job.hitMolSdf : text === 'hits.csv' ? job.hitMolCsv : null;
+						saveAs(new Blob([bp]), text);
+					});
 				});
 				$('#qryMolProperties span').each(function () { // 'this' binding is used.
 					const t = $(this);
