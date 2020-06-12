@@ -439,14 +439,6 @@ $(() => {
 			const refreshQryMol = (qryMolIdxClicked) => {
 				const qryMol = qryMolecules[qryMolIdx = qryMolIdxClicked];
 				refreshMolecule(qryMol, iviews[0]);
-				$('#downloads a').each(function () { // 'this' binding is used.
-					$(this).click((e) => {
-						e.preventDefault();
-						const text = e.target.text;
-						const bp = text === 'hits.sdf' ? job.hitMolSdf : text === 'hits.csv' ? job.hitMolCsv : null;
-						saveAs(new Blob([bp]), text);
-					});
-				});
 				$('#qryMolProperties span').each(function () { // 'this' binding is used.
 					const t = $(this);
 					const prop = t.attr('id');
@@ -467,17 +459,25 @@ $(() => {
 				smilesDrawer.draw(qryMol['canonicalSmilesTree'], 'qryMolCanvas2D', 'dark');
 				const hitMolecules = parseSDF(job.hitMolSdf);
 				if (hitMolecules.length !== 100) throw Error("hitMolecules.length !== 100");
-				const hitMolCsvLines = job.hitMolCsv.split(/\r?\n/).slice(1, 101);
-				if (hitMolCsvLines.length !== hitMolecules.length) throw Error('hitMolCsvLines.length !== hitMolecules.length');
-				const propNames = [ 'usr_score', 'usrcat_score', 'tanimoto_score', 'canonicalSMILES', 'molFormula', 'numAtoms', 'numHBD', 'numHBA', 'numRotatableBonds', 'numRings', 'exactMW', 'tPSA', 'clogP' ];
-				$.each(hitMolecules, (i, molecule) => {
-					const properties = hitMolCsvLines[i].split(',');
-					if (molecule.id !== properties[0]) throw Error('molecule.id !== properties[0]');
-					$.each(propNames, (j, propName) => {
-						molecule[propName] = properties[1+j];
+				$('#hitMolIdsLabel').text(hitMolecules.length + ' hit molecules sorted by ' + job.score + ' score');
+				$('#downloads a').each(function () { // 'this' binding is used.
+					$(this).click((e) => {
+						e.preventDefault();
+						const text = e.target.text;
+						const bp = text === 'hits.sdf' ? job.hitMolSdf : text === 'hits.csv' ? (() => { // Reconstruct hitMolCsv from hitMolSdf
+							const props = ['database', 'id', 'usrScore', 'usrcatScore', 'tanimotoScore', 'canonicalSMILES', 'molFormula', 'numAtoms', 'numHBD', 'numHBA', 'numRotatableBonds', 'numRings', 'exactMW', 'tPSA', 'clogP'];
+							return [
+								props.join(','),
+								...hitMolecules.map((hitMol) => {
+									return props.map((prop) => {
+										return hitMol[prop];
+									}).join(',');
+								}),
+							].join('\n');
+						})() : null;
+						saveAs(new Blob([bp]), text);
 					});
 				});
-				$('#hitMolIdsLabel').text(hitMolecules.length + ' hit molecules sorted by ' + job.score + ' score');
 				var hitMolIdx;
 				const refreshHitMol = (hitMolIdxClicked) => {
 					const hitMol = hitMolecules[hitMolIdx = hitMolIdxClicked];
