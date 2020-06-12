@@ -29,17 +29,17 @@ int main(int argc, char* argv[])
 	const auto& qryMol = *qry_ptr;
 
 	// Get the number of heavy atoms, excluding hydrogens.
-	const auto num_points = qryMol.getNumHeavyAtoms();
+	const auto num_atoms = qryMol.getNumHeavyAtoms();
 
 	// Ensure the molecule contains some heavy atoms.
-	if (!num_points) return 2;
+	if (!num_atoms) return 2;
 
 	// Ensure the number of heavy atoms obtained by SMARTS matching equals the number of heavy atoms obtained by getNumHeavyAtoms().
 	const unique_ptr<ROMol> SubsetMol(reinterpret_cast<ROMol*>(SmartsToMol("[!#1]"))); // heavy
 	vector<vector<pair<int, int>>> matchVect;
 	SubstructMatch(qryMol, *SubsetMol, matchVect);
 	const auto num_matches = matchVect.size();
-	if (num_matches != num_points) return 3;
+	if (num_matches != num_atoms) return 3;
 
 	// Ensure the removeHs() function can successfully sanitize and kekulize the molecule, avoiding "Can't kekulize mol."
 	const unique_ptr<ROMol> qryMolNoH(removeHs(qryMol));
@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
 	// Calculate canonical SMILES.
 	qryMol.setProp<string>("canonicalSMILES", MolToSmiles(*qryMolNoH)); // Default parameters are: const ROMol& mol, bool doIsomericSmiles = true, bool doKekule = false, int rootedAtAtom = -1, bool canonical = true, bool allBondsExplicit = false, bool allHsExplicit = false, bool doRandom = false. https://www.rdkit.org/docs/cppapi/namespaceRDKit.html#a3636828cca83a233d7816f3652a9eb6b
 	qryMol.setProp<string>("molFormula", calcMolFormula(qryMol));
-	qryMol.setProp<unsigned int>("numAtoms", num_points);
+	qryMol.setProp<unsigned int>("numAtoms", num_atoms);
 	qryMol.setProp<unsigned int>("numHBD", calcNumHBD(qryMol));
 	qryMol.setProp<unsigned int>("numHBA", calcNumHBA(qryMol));
 	qryMol.setProp<unsigned int>("numRotatableBonds", calcNumRotatableBonds(qryMol));
