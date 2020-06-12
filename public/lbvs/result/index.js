@@ -490,7 +490,12 @@ $(() => {
 					$('#hitMolProperties span').each(function () { // 'this' binding is used.
 						const t = $(this);
 						const prop = t.attr('id');
-						t.text(hitMol[prop]); // TODO parseFloat() before toFixed().
+						const idx = ['tPSA', 'exactMW', 'clogP'].indexOf(prop);
+						if (idx === -1) {
+							t.text(hitMol[prop]);
+						} else {
+							t.text(hitMol[prop].toFixed(2 + idx)); // Display tPSA with 2 digits. Display exactMW with 3 digits. Display clogP with 4 digits.
+						}
 					});
 					$('#hitMolProperties #id').parent().attr('href', cpdb.cmpdLink.format(hitMol.id, cpdb.name === 'PADFrag' ? ['drug', 'fragment'][+(hitMol.id.charAt(3) === 'F')] : undefined));
 					if (!hitMol['canonicalSmilesTree']) {
