@@ -127,12 +127,12 @@
 						<li>Canonical SMILES: <span id="canonicalSMILES"></span></li>
 						<li>Molecular formula: <span id="molFormula"></span></li>
 						<li>Heavy atoms: <span id="numAtoms"></span></li>
-						<li>Molecular weight (g/mol): <span id="exactMW"></span></li>
-						<li>Partition coefficient clogP: <span id="clogP"></span></li>
 						<li>Rotatable bonds: <span id="numRotatableBonds"></span></li>
 						<li>Rings: <span id="numRings"></span></li>
 						<li>Hydrogen bond donors: <span id="numHBD"></span></li>
 						<li>Hydrogen bond acceptors: <span id="numHBA"></span></li>
+						<li>Molecular weight (g/mol): <span id="exactMW"></span></li>
+						<li>Partition coefficient clogP: <span id="clogP"></span></li>
 						<li>Polar surface area tPSA (&Aring;<sup>2</sup>): <span id="tPSA"></span></li>
 					</ul>
 				</div>
@@ -143,26 +143,11 @@
 						<li>USRCAT score: <span id="usrcatScore"></span></li>
 						<li>Tanimoto score: <span id="tanimotoScore"></span></li>
 					</ul>
-				</div>
-				<div class="col-lg-4" id="hitMolProperties">
-					<p>The selected hit molecule</p>
-					<ul>
-						<li>ID: <a target="_blank" rel="noreferrer"><span id="id"></span></a></li>
-						<li>Canonical SMILES: <span id="canonicalSMILES"></span></li>
-						<li>Molecular formula: <span id="molFormula"></span></li>
-						<li>Heavy atoms: <span id="numAtoms"></span></li>
-						<li>Molecular weight (g/mol): <span id="exactMW"></span></li>
-						<li>Partition coefficient clogP: <span id="clogP"></span></li>
-						<li>Rotatable bonds: <span id="numRotatableBonds"></span></li>
-						<li>Rings: <span id="numRings"></span></li>
-						<li>Hydrogen bond donors: <span id="numHBD"></span></li>
-						<li>Hydrogen bond acceptors: <span id="numHBA"></span></li>
-						<li>Polar surface area tPSA (&Aring;<sup>2</sup>): <span id="tPSA"></span></li>
+					<p>Hit molecules for download</p>
+					<ul id="downloads">
+						<li><a href="#">hits.sdf</a></li>
+						<li><a href="#">hits.csv</a></li>
 					</ul>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-lg-6">
 					<p>Keyings</p>
 					<ul>
 						<li>Default: rotate</li>
@@ -171,11 +156,20 @@
 						<li>Ctrl + shift: slab</li>
 					</ul>
 				</div>
-				<div class="col-lg-6">
-					<p>Hit molecules for download</p>
-					<ul id="downloads">
-						<li><a href="#">hits.sdf</a></li>
-						<li><a href="#">hits.csv</a></li>
+				<div class="col-lg-4" id="hitMolProperties">
+					<p>The selected hit molecule</p>
+					<ul>
+						<li>ID: <a target="_blank" rel="noreferrer"><span id="id"></span></a></li>
+						<li>Canonical SMILES: <span id="canonicalSMILES"></span></li>
+						<li>Molecular formula: <span id="molFormula"></span></li>
+						<li>Heavy atoms: <span id="numAtoms"></span></li>
+						<li>Rotatable bonds: <span id="numRotatableBonds"></span></li>
+						<li>Rings: <span id="numRings"></span></li>
+						<li>Hydrogen bond donors: <span id="numHBD"></span></li>
+						<li>Hydrogen bond acceptors: <span id="numHBA"></span></li>
+						<li>Molecular weight (g/mol): <span id="exactMW"></span></li>
+						<li>Partition coefficient clogP: <span id="clogP"></span></li>
+						<li>Polar surface area tPSA (&Aring;<sup>2</sup>): <span id="tPSA"></span></li>
 					</ul>
 				</div>
 			</div>
