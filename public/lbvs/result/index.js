@@ -432,10 +432,30 @@ $(() => {
 			const cpdb = databases.find((cpdb) => {
 				return cpdb.name === job.database;
 			});
-			const qryMolecules = parseSDF(job.qryMolSdf).slice(0, 1); // Take out only the first query molecule and discard subsequent query molecules, if any.
-			if (qryMolecules.length !== job.numQueries) throw Error('qryMolecules.length !== job.numQueries');
+			const qryMolecules = parseSDF(job.qryMolSdf);
+			const hitMolecules = parseSDF(job.hitMolSdf);
+			console.assert(qryMolecules.length === job.numQueries);
+			console.assert(hitMolecules.length === job.numQueries * 100);
 			$('#qryMolIdsLabel').text(`${qryMolecules.length} query molecule${['', 's'][+(qryMolecules.length > 1)]}`);
-			var qryMolIdx;
+			$('#hitMolIdsLabel').text(`100 hit molecules sorted by ${job.score} score`);
+			$('#downloads a').each(function () { // 'this' binding is used.
+				$(this).click((e) => {
+					e.preventDefault();
+					const text = e.target.text;
+					saveAs(new Blob([text === 'hits.sdf' ? job.hitMolSdf : text === 'hits.csv' ? (() => { // Reconstruct hitMolCsv from hitMolSdf
+						const props = ['query', 'database', 'id', 'usrScore', 'usrcatScore', 'tanimotoScore', 'canonicalSMILES', 'molFormula', 'numAtoms', 'numHBD', 'numHBA', 'numRotatableBonds', 'numRings', 'exactMW', 'tPSA', 'clogP'];
+						return [
+							props.join(','),
+							...hitMolecules.map((hitMol) => {
+								return props.map((prop) => {
+									return hitMol[prop];
+								}).join(',');
+							}),
+						].join('\n');
+					})() : null]), text);
+				});
+			});
+			let qryMolIdx, hitMolIdx;
 			const refreshQryMol = (qryMolIdxClicked) => {
 				const qryMol = qryMolecules[qryMolIdx = qryMolIdxClicked];
 				refreshMolecule(qryMol, iviews[0]);
@@ -453,34 +473,12 @@ $(() => {
 					SmilesDrawer.parse(qryMol['canonicalSMILES'], (qryMolSmilesTree) => { // SmilesDrawer.parse() is a static function.
 						qryMol['canonicalSmilesTree'] = qryMolSmilesTree;
 					}, (err) => {
-						// TODO: noty()
+						console.error(err); // Alternatively, use noty() to notify the user.
 					});
 				}
 				smilesDrawer.draw(qryMol['canonicalSmilesTree'], 'qryMolCanvas2D', 'dark');
-				const hitMolecules = parseSDF(job.hitMolSdf);
-				if (hitMolecules.length !== 100) throw Error("hitMolecules.length !== 100");
-				$('#hitMolIdsLabel').text(hitMolecules.length + ' hit molecules sorted by ' + job.score + ' score');
-				$('#downloads a').each(function () { // 'this' binding is used.
-					$(this).click((e) => {
-						e.preventDefault();
-						const text = e.target.text;
-						const bp = text === 'hits.sdf' ? job.hitMolSdf : text === 'hits.csv' ? (() => { // Reconstruct hitMolCsv from hitMolSdf
-							const props = ['database', 'id', 'usrScore', 'usrcatScore', 'tanimotoScore', 'canonicalSMILES', 'molFormula', 'numAtoms', 'numHBD', 'numHBA', 'numRotatableBonds', 'numRings', 'exactMW', 'tPSA', 'clogP'];
-							return [
-								props.join(','),
-								...hitMolecules.map((hitMol) => {
-									return props.map((prop) => {
-										return hitMol[prop];
-									}).join(',');
-								}),
-							].join('\n');
-						})() : null;
-						saveAs(new Blob([bp]), text);
-					});
-				});
-				var hitMolIdx;
 				const refreshHitMol = (hitMolIdxClicked) => {
-					const hitMol = hitMolecules[hitMolIdx = hitMolIdxClicked];
+					const hitMol = hitMolecules[100 * qryMolIdx + (hitMolIdx = hitMolIdxClicked)];
 					refreshMolecule(hitMol, iviews[1]);
 					$('#hitMolScores span').each(function () { // 'this' binding is used.
 						const t = $(this);
@@ -502,17 +500,17 @@ $(() => {
 						SmilesDrawer.parse(hitMol['canonicalSMILES'], (hitMolSmilesTree) => { // SmilesDrawer.parse() is a static function.
 							hitMol['canonicalSmilesTree'] = hitMolSmilesTree;
 						}, (err) => {
-							// TODO: noty()
+							console.error(err); // Alternatively, use noty() to notify the user.
 						});
 					}
 					smilesDrawer.draw(hitMol['canonicalSmilesTree'], 'hitMolCanvas2D', 'dark');
 				};
 				const hitMolIds = $('#hitMolIds');
-				hitMolIds.html(hitMolecules.map((hitMol, index) => {
+				hitMolIds.html(hitMolecules.slice(100 * qryMolIdx, 100 * (1 + qryMolIdx)).map((hitMol, index) => {
 					return `<button type="button" class="btn btn-primary">${index}</button>`;
 				}).join(''));
 				$('> button', hitMolIds).click((e) => {
-					const hitMolIdxClicked = $(e.target).text();
+					const hitMolIdxClicked = parseInt($(e.target).text());
 					if (hitMolIdxClicked == hitMolIdx) return;
 					$('> button.active', hitMolIds).removeClass('active');
 					refreshHitMol(hitMolIdxClicked);
@@ -525,7 +523,7 @@ $(() => {
 				return `<button type="button" class="btn btn-primary">${index}</button>`;
 			}).join(''));
 			$('> .btn', qryMolIds).click((e) => {
-				const qryMolIdxClicked = $(e.target).text();
+				const qryMolIdxClicked = parseInt($(e.target).text());
 				if (qryMolIdxClicked == qryMolIdx) return;
 				$('> button.active', qryMolIds).removeClass('active');
 				refreshQryMol(qryMolIdxClicked);
