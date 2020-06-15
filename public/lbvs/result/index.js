@@ -429,15 +429,89 @@ $(() => {
 				width: 540,
 				height: 540,
 			});
+			const drawSmiles = (mol, canvas) => {
+				if (!mol['canonicalSmilesTree']) {
+					SmilesDrawer.parse(mol['canonicalSMILES'], (smilesTree) => { // SmilesDrawer.parse() is a static function.
+						mol['canonicalSmilesTree'] = smilesTree;
+					}, (err) => {
+						console.error(err); // Alternatively, use noty() to notify the user.
+					});
+				}
+				smilesDrawer.draw(mol['canonicalSmilesTree'], canvas, 'dark');
+			};
+			const numHits = 100;
 			const cpdb = databases.find((cpdb) => {
 				return cpdb.name === job.database;
 			});
 			const qryMolecules = parseSDF(job.qryMolSdf);
 			const hitMolecules = parseSDF(job.hitMolSdf);
 			console.assert(qryMolecules.length === job.numQueries);
-			console.assert(hitMolecules.length === job.numQueries * 100);
+			console.assert(hitMolecules.length === job.numQueries * numHits);
 			$('#qryMolIdsLabel').text(`${qryMolecules.length} query molecule${['', 's'][+(qryMolecules.length > 1)]}`);
-			$('#hitMolIdsLabel').text(`100 hit molecules sorted by ${job.score} score`);
+			$('#hitMolIdsLabel').text(`${numHits} hit molecules sorted by ${job.score} score`);
+			const hitMolIds = $('#hitMolIds');
+			const qryMolIds = $('#qryMolIds');
+			hitMolIds.html([...Array(numHits).keys()].map((index) => { // hitMolecules.slice(numHits * qryMolIdx, numHits * (1 + qryMolIdx)).map((hitMol, index) => {});
+				return `<button type="button" class="btn">${index}</button>`;
+			}).join(''));
+			qryMolIds.html(qryMolecules.map((qryMol, index) => {
+				return `<button type="button" class="btn">${index}</button>`;
+			}).join(''));
+			let qryMolIdx = 0, hitMolIdx = 0;
+			const refreshHitMol = (hitMolIdxClicked) => {
+				$(`:nth-child(${1 + hitMolIdx})`, hitMolIds).removeClass('btn-primary'); // The value to the :nth- selectors is 1-indexed.
+				hitMolIdx = hitMolIdxClicked;
+				$(`:nth-child(${1 + hitMolIdx})`, hitMolIds).addClass('btn-primary'); // The value to the :nth- selectors is 1-indexed.
+				const hitMol = hitMolecules[numHits * qryMolIdx + hitMolIdx];
+				drawSmiles(hitMol, 'hitMolCanvas2D');
+				refreshMolecule(hitMol, iviews[1]);
+				$('#hitMolScores span').each(function () { // 'this' binding is used.
+					const t = $(this);
+					const prop = t.attr('id');
+					t.text(parseFloat(hitMol[prop]).toFixed(6));
+				});
+				$('#hitMolProperties span').each(function () { // 'this' binding is used.
+					const t = $(this);
+					const prop = t.attr('id');
+					const idx = ['tPSA', 'exactMW', 'clogP'].indexOf(prop);
+					if (idx === -1) {
+						t.text(hitMol[prop]);
+					} else {
+						t.text(hitMol[prop].toFixed(2 + idx)); // Display tPSA with 2 digits. Display exactMW with 3 digits. Display clogP with 4 digits.
+					}
+				});
+				$('#hitMolProperties #id').parent().attr('href', cpdb.cmpdLink.format(hitMol.id, cpdb.name === 'PADFrag' ? ['drug', 'fragment'][+(hitMol.id.charAt(3) === 'F')] : undefined));
+			};
+			const refreshQryMol = (qryMolIdxClicked) => {
+				$(`:nth-child(${1 + qryMolIdx})`, qryMolIds).removeClass('btn-primary'); // The value to the :nth- selectors is 1-indexed.
+				qryMolIdx = qryMolIdxClicked;
+				$(`:nth-child(${1 + qryMolIdx})`, qryMolIds).addClass('btn-primary'); // The value to the :nth- selectors is 1-indexed.
+				const qryMol = qryMolecules[qryMolIdx];
+				drawSmiles(qryMol, 'qryMolCanvas2D');
+				refreshMolecule(qryMol, iviews[0]);
+				$('#qryMolProperties span').each(function () { // 'this' binding is used.
+					const t = $(this);
+					const prop = t.attr('id');
+					const idx = ['tPSA', 'exactMW', 'clogP'].indexOf(prop);
+					if (idx === -1) {
+						t.text(qryMol[prop]);
+					} else {
+						t.text(qryMol[prop].toFixed(2 + idx)); // Display tPSA with 2 digits. Display exactMW with 3 digits. Display clogP with 4 digits.
+					}
+				});
+				refreshHitMol(0); // When the selected query molecule is changed, reset the selected hit molecule to the first.
+			};
+			refreshQryMol(0);
+			$('> button', hitMolIds).click((e) => {
+				const hitMolIdxClicked = parseInt($(e.target).text());
+				if (hitMolIdxClicked == hitMolIdx) return;
+				refreshHitMol(hitMolIdxClicked);
+			});
+			$('> button', qryMolIds).click((e) => {
+				const qryMolIdxClicked = parseInt($(e.target).text());
+				if (qryMolIdxClicked == qryMolIdx) return;
+				refreshQryMol(qryMolIdxClicked);
+			});
 			$('#downloads a').each(function () { // 'this' binding is used.
 				$(this).click((e) => {
 					e.preventDefault();
@@ -455,81 +529,6 @@ $(() => {
 					})() : null]), text);
 				});
 			});
-			let qryMolIdx, hitMolIdx;
-			const refreshQryMol = (qryMolIdxClicked) => {
-				const qryMol = qryMolecules[qryMolIdx = qryMolIdxClicked];
-				refreshMolecule(qryMol, iviews[0]);
-				$('#qryMolProperties span').each(function () { // 'this' binding is used.
-					const t = $(this);
-					const prop = t.attr('id');
-					const idx = ['tPSA', 'exactMW', 'clogP'].indexOf(prop);
-					if (idx === -1) {
-						t.text(qryMol[prop]);
-					} else {
-						t.text(qryMol[prop].toFixed(2 + idx)); // Display tPSA with 2 digits. Display exactMW with 3 digits. Display clogP with 4 digits.
-					}
-				});
-				if (!qryMol['canonicalSmilesTree']) {
-					SmilesDrawer.parse(qryMol['canonicalSMILES'], (qryMolSmilesTree) => { // SmilesDrawer.parse() is a static function.
-						qryMol['canonicalSmilesTree'] = qryMolSmilesTree;
-					}, (err) => {
-						console.error(err); // Alternatively, use noty() to notify the user.
-					});
-				}
-				smilesDrawer.draw(qryMol['canonicalSmilesTree'], 'qryMolCanvas2D', 'dark');
-				const refreshHitMol = (hitMolIdxClicked) => {
-					const hitMol = hitMolecules[100 * qryMolIdx + (hitMolIdx = hitMolIdxClicked)];
-					refreshMolecule(hitMol, iviews[1]);
-					$('#hitMolScores span').each(function () { // 'this' binding is used.
-						const t = $(this);
-						const prop = t.attr('id');
-						t.text(parseFloat(hitMol[prop]).toFixed(6));
-					});
-					$('#hitMolProperties span').each(function () { // 'this' binding is used.
-						const t = $(this);
-						const prop = t.attr('id');
-						const idx = ['tPSA', 'exactMW', 'clogP'].indexOf(prop);
-						if (idx === -1) {
-							t.text(hitMol[prop]);
-						} else {
-							t.text(hitMol[prop].toFixed(2 + idx)); // Display tPSA with 2 digits. Display exactMW with 3 digits. Display clogP with 4 digits.
-						}
-					});
-					$('#hitMolProperties #id').parent().attr('href', cpdb.cmpdLink.format(hitMol.id, cpdb.name === 'PADFrag' ? ['drug', 'fragment'][+(hitMol.id.charAt(3) === 'F')] : undefined));
-					if (!hitMol['canonicalSmilesTree']) {
-						SmilesDrawer.parse(hitMol['canonicalSMILES'], (hitMolSmilesTree) => { // SmilesDrawer.parse() is a static function.
-							hitMol['canonicalSmilesTree'] = hitMolSmilesTree;
-						}, (err) => {
-							console.error(err); // Alternatively, use noty() to notify the user.
-						});
-					}
-					smilesDrawer.draw(hitMol['canonicalSmilesTree'], 'hitMolCanvas2D', 'dark');
-				};
-				const hitMolIds = $('#hitMolIds');
-				hitMolIds.html(hitMolecules.slice(100 * qryMolIdx, 100 * (1 + qryMolIdx)).map((hitMol, index) => {
-					return `<button type="button" class="btn btn-primary">${index}</button>`;
-				}).join(''));
-				$('> button', hitMolIds).click((e) => {
-					const hitMolIdxClicked = parseInt($(e.target).text());
-					if (hitMolIdxClicked == hitMolIdx) return;
-					$('> button.active', hitMolIds).removeClass('active');
-					refreshHitMol(hitMolIdxClicked);
-				});
-				$(':first', hitMolIds).addClass('active');
-				refreshHitMol(0);
-			};
-			const qryMolIds = $('#qryMolIds');
-			qryMolIds.html(qryMolecules.map((qryMol, index) => {
-				return `<button type="button" class="btn btn-primary">${index}</button>`;
-			}).join(''));
-			$('> .btn', qryMolIds).click((e) => {
-				const qryMolIdxClicked = parseInt($(e.target).text());
-				if (qryMolIdxClicked == qryMolIdx) return;
-				$('> button.active', qryMolIds).removeClass('active');
-				refreshQryMol(qryMolIdxClicked);
-			});
-			$(':first', qryMolIds).addClass('active');
-			refreshQryMol(0);
 		});
 	};
 	const queryArr = location.search.substr(1).split('&').map((kv) => {
