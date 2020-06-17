@@ -391,11 +391,6 @@ $(() => {
 						if (line[0] === '>') {
 							const prop = line.split('<')[1].split('>')[0];
 							molecule[prop] = lines[offset++];
-							if (prop.startsWith('num')) {
-								molecule[prop] = parseInt(molecule[prop]);
-							} else if (['exactMW', 'clogP', 'tPSA', 'usrScore', 'usrcatScore', 'tanimotoScore'].includes(prop)) {
-								molecule[prop] = parseFloat(molecule[prop]);
-							}
 						}
 					}
 					molecules.push(molecule);
@@ -447,6 +442,16 @@ $(() => {
 			});
 			const qryMolecules = parseSdf(job.qryMolSdf);
 			const hitMolecules = parseSdf(job.hitMolSdf);
+			[qryMolecules, hitMolecules].forEach((molecules) => {
+				molecules.forEach((mol) => {
+					['numAtoms', 'numHBD', 'numHBA', 'numRotatableBonds', 'numRings'].forEach((prop) => {
+						mol[prop] = parseInt(mol[prop]);
+					});
+					['usrScore', 'usrcatScore', 'tanimotoScore', 'exactMW', 'tPSA', 'clogP'].forEach((prop) => {
+						mol[prop] = parseFloat(mol[prop]);
+					});
+				});
+			});
 			console.assert(qryMolecules.length === job.numQueries);
 			console.assert(hitMolecules.length === job.numQueries * numHits);
 			$('#qryMolIdsLabel').text(`${qryMolecules.length} query molecule${['', 's'][+(qryMolecules.length > 1)]}`);
