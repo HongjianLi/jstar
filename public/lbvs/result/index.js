@@ -77,8 +77,8 @@ $(() => {
 			return arguments[i]; // The arguments variable is from the String.prototype.format, not from the anonymous lambda function.
 		});
 	}
-	const tick = (jobIdVal) => {
-		$.get('/lbvs/job', { id: jobIdVal }, (job) => {
+	const tick = (jobId) => {
+		$.get('/lbvs/job', { id: jobId }, (job) => {
 			console.log(job);
 			['numQueries', 'numConformers'].forEach((key) => {
 				job[key] = parseInt(job[key]);
@@ -105,7 +105,7 @@ $(() => {
 				}
 			});
 			if (!job.endDate) {
-				setTimeout(() => { tick(jobIdVal); }, 1000);
+				setTimeout(() => { tick(jobId); }, 1000);
 				return;
 			}
 			if (job.error) return;
@@ -535,10 +535,10 @@ $(() => {
 		const [ key, val ] = kv.split('=');
 		return { key, val };
 	});
-	const jobId = queryArr.find((kv) => {
+	const jobIdKV = queryArr.find((kv) => {
 		return kv.key === 'id';
 	});
-	if (jobId) {
-		tick(jobId.val);
+	if (jobIdKV) {
+		tick(jobIdKV.val);
 	}
 });
