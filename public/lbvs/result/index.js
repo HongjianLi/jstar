@@ -460,6 +460,15 @@ $(() => {
 				return `<button type="button" class="btn">${index}</button>`;
 			}).join(''));
 			let qryMolIdx = 0, hitMolIdx = 0;
+			const refreshSpan = (span, mol) => {
+				const prop = span.attr('id');
+				const idx = ['usrScore', 'usrcatScore', 'tanimotoScore', 'exactMW', 'tPSA', 'clogP'].indexOf(prop);
+				if (idx === -1) {
+					span.text(mol[prop]);
+				} else {
+					span.text(mol[prop].toFixed([6, 6, 6, 3, 2, 4][idx])); // Display scores with 6 digits. Display tPSA with 2 digits. Display exactMW with 3 digits. Display clogP with 4 digits.
+				}
+			};
 			const refreshHitMol = (hitMolIdxClicked) => {
 				$(`:nth-child(${1 + hitMolIdx})`, hitMolIds).removeClass('btn-primary'); // The value to the :nth- selectors is 1-indexed.
 				hitMolIdx = hitMolIdxClicked;
@@ -468,19 +477,10 @@ $(() => {
 				drawSmiles(hitMol, 'hitMolCanvas2D');
 				refreshMolecule(hitMol, iviews[1]);
 				$('#hitMolScores span').each((index, span) => {
-					const s = $(span);
-					const prop = s.attr('id');
-					s.text(hitMol[prop].toFixed(6));
+					refreshSpan($(span), hitMol);
 				});
 				$('#hitMolProperties span').each((index, span) => {
-					const s = $(span);
-					const prop = s.attr('id');
-					const idx = ['tPSA', 'exactMW', 'clogP'].indexOf(prop);
-					if (idx === -1) {
-						s.text(hitMol[prop]);
-					} else {
-						s.text(hitMol[prop].toFixed(2 + idx)); // Display tPSA with 2 digits. Display exactMW with 3 digits. Display clogP with 4 digits.
-					}
+					refreshSpan($(span), hitMol);
 				});
 				$('#hitMolProperties #id').parent().attr('href', cpdb.cmpdLink.format(hitMol.id, cpdb.name === 'PADFrag' ? ['drug', 'fragment'][+(hitMol.id.charAt(3) === 'F')] : undefined));
 			};
@@ -492,14 +492,7 @@ $(() => {
 				drawSmiles(qryMol, 'qryMolCanvas2D');
 				refreshMolecule(qryMol, iviews[0]);
 				$('#qryMolProperties span').each((index, span) => {
-					const s = $(span);
-					const prop = s.attr('id');
-					const idx = ['tPSA', 'exactMW', 'clogP'].indexOf(prop);
-					if (idx === -1) {
-						s.text(qryMol[prop]);
-					} else {
-						s.text(qryMol[prop].toFixed(2 + idx)); // Display tPSA with 2 digits. Display exactMW with 3 digits. Display clogP with 4 digits.
-					}
+					refreshSpan($(span), qryMol);
 				});
 				refreshHitMol(0); // When the selected query molecule is changed, reset the selected hit molecule to the first.
 			};
