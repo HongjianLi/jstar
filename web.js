@@ -311,7 +311,6 @@ const cluster = require('cluster');
 				'startDate': 1,
 				'endDate': 1,
 				'hitMolSdf': 1,
-				'hitMolCsv': 1,
 				'numQueries': 1,
 				'numConformers': 1,
 			},
