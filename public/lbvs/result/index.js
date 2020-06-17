@@ -466,7 +466,7 @@ $(() => {
 			}).join(''));
 			let qryMolIdx = 0, hitMolIdx = 0;
 			const refreshSpan = (span, mol) => {
-				const prop = span.attr('id');
+				const prop = span.attr('id').split('_')[1]; // Ignore the qryMol_ or hitMol_ prefix. The prefix is only used to avoid duplicate id in html.
 				const idx = ['usrScore', 'usrcatScore', 'tanimotoScore', 'exactMW', 'tPSA', 'clogP'].indexOf(prop);
 				if (idx === -1) {
 					span.text(mol[prop]);
