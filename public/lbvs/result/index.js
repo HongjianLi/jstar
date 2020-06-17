@@ -77,42 +77,44 @@ $(() => {
 			return arguments[i]; // The arguments variable is from the String.prototype.format, not from the anonymous lambda function.
 		});
 	}
+	let tickCount = 0;
 	const tick = (jobId) => {
 		$.get('/lbvs/job', { id: jobId }, (job) => {
-			console.log(job);
-			['numQueries', 'numConformers'].forEach((key) => {
-				job[key] = parseInt(job[key]);
-			});
+			if (!job || !job.submitDate) return; // null will be returned if no job matching the id is found. { error: [] } will be returned if the job id fails the server side validation.
+			if (++tickCount === 1) {
+				$('#jobInfo #filename').parent().click((e) => {
+					e.preventDefault();
+					saveAs(new Blob([job.qryMolSdf], { type: 'text/plain;charset=utf-8' }), job.filename);
+				});
+			}
 			['submitDate', 'startDate', 'endDate'].forEach((key) => {
 				if (!job[key]) return;
 				job[key] = new Date(job[key]);
 				job[key.replace('Date', 'Time')] = $.format.date(job[key], 'HH:mm:ss.SSS'); // Save the time format to a new key, e.g. submitDate -> submitTime
 			});
 			if (job.endDate) {
+				['numQueries', 'numConformers'].forEach((key) => {
+					job[key] = parseInt(job[key]);
+				});
 				job.runtime = (job.endDate - job.startDate) * 1e-3; // in seconds.
 				job.speed = job.numConformers * job.numQueries * 1e-3 / job.runtime; // in K conformers per second.
 				job.runtime = `${job.runtime.toFixed(3)} s`; // Format runtime to an expressive string.
-				job.status = ['<span class="text-danger">Failed</span>', '<span class="text-success">Completed</span>'][+!job.error];
+				job.status = 'Completed';
 			} else {
-				job.status = ['<span class="text-info">Executing</span>', '<span class="text-warning">Queued</span>'][+!job.startDate];
+				job.status = ['Executing', 'Queued'][+!job.startDate];
 				$('#results').hide();
 			}
-			$('#status span').each(function (d) { // 'this' binding is used.
-				const t = $(this);
-				const c = job[t.attr('id')];
-				if (t.html() !== c) {
-					t.html(c).hide().fadeIn('slow');
+			$('#jobInfo span').each((index, span) => {
+				const s = $(span);
+				const t = job[s.attr('id')];
+				if (t && s.text() !== t) {
+					s.text(t).hide().fadeIn('slow');
 				}
 			});
 			if (!job.endDate) {
 				setTimeout(() => { tick(jobId); }, 1000);
 				return;
 			}
-			if (job.error) return;
-			$('#status #filename').parent().click((e) => {
-				e.preventDefault();
-				saveAs(new Blob([job.qryMolSdf], {type: 'text/plain;charset=utf-8'}), job.filename);
-			});
 			$('#results').show();
 			const gaugeScreeningSpeed = echarts.init(document.getElementById('gaugeScreeningSpeed'));
 			gaugeScreeningSpeed.setOption({
