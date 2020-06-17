@@ -83,10 +83,10 @@ $(() => {
 			['numQueries', 'numConformers'].forEach((key) => {
 				job[key] = parseInt(job[key]);
 			});
-			['submit', 'start', 'end'].forEach((key) => {
-				if (!job[key + 'Date']) return;
-				job[key + 'Date'] = new Date(job[key + 'Date']);
-				job[key + 'Time'] = $.format.date(job[key + 'Date'], 'HH:mm:ss.SSS');
+			['submitDate', 'startDate', 'endDate'].forEach((key) => {
+				if (!job[key]) return;
+				job[key] = new Date(job[key]);
+				job[key.replace('Date', 'Time')] = $.format.date(job[key], 'HH:mm:ss.SSS'); // Save the time format to a new key, e.g. submitDate -> submitTime
 			});
 			if (job.endDate) {
 				job.runtime = (job.endDate - job.startDate) * 1e-3; // in seconds.
