@@ -487,7 +487,7 @@ $(() => {
 				$('#hitMolProperties span').each((index, span) => {
 					refreshSpan($(span), hitMol);
 				});
-				$('#hitMolProperties #id').parent().attr('href', cpdb.cmpdLink.format(hitMol.id, cpdb.name === 'PADFrag' ? ['drug', 'fragment'][+(hitMol.id.charAt(3) === 'F')] : undefined));
+				$('#hitMolProperties #hitMol_id').parent().attr('href', cpdb.cmpdLink.format(hitMol.id, cpdb.name === 'PADFrag' ? ['drug', 'fragment'][+(hitMol.id.charAt(3) === 'F')] : undefined));
 			};
 			const refreshQryMol = (qryMolIdxClicked) => {
 				$(`:nth-child(${1 + qryMolIdx})`, qryMolIds).removeClass('btn-primary'); // The value to the :nth- selectors is 1-indexed.
