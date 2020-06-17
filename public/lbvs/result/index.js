@@ -393,7 +393,7 @@ $(() => {
 							molecule[prop] = lines[offset++];
 							if (prop.startsWith('num')) {
 								molecule[prop] = parseInt(molecule[prop]);
-							} else if (['exactMW', 'clogP', 'tPSA'].includes(prop)) {
+							} else if (['exactMW', 'clogP', 'tPSA', 'usrScore', 'usrcatScore', 'tanimotoScore'].includes(prop)) {
 								molecule[prop] = parseFloat(molecule[prop]);
 							}
 						}
@@ -467,19 +467,19 @@ $(() => {
 				const hitMol = hitMolecules[numHits * qryMolIdx + hitMolIdx];
 				drawSmiles(hitMol, 'hitMolCanvas2D');
 				refreshMolecule(hitMol, iviews[1]);
-				$('#hitMolScores span').each(function () { // 'this' binding is used.
-					const t = $(this);
-					const prop = t.attr('id');
-					t.text(parseFloat(hitMol[prop]).toFixed(6));
+				$('#hitMolScores span').each((index, span) => {
+					const s = $(span);
+					const prop = s.attr('id');
+					s.text(hitMol[prop].toFixed(6));
 				});
-				$('#hitMolProperties span').each(function () { // 'this' binding is used.
-					const t = $(this);
-					const prop = t.attr('id');
+				$('#hitMolProperties span').each((index, span) => {
+					const s = $(span);
+					const prop = s.attr('id');
 					const idx = ['tPSA', 'exactMW', 'clogP'].indexOf(prop);
 					if (idx === -1) {
-						t.text(hitMol[prop]);
+						s.text(hitMol[prop]);
 					} else {
-						t.text(hitMol[prop].toFixed(2 + idx)); // Display tPSA with 2 digits. Display exactMW with 3 digits. Display clogP with 4 digits.
+						s.text(hitMol[prop].toFixed(2 + idx)); // Display tPSA with 2 digits. Display exactMW with 3 digits. Display clogP with 4 digits.
 					}
 				});
 				$('#hitMolProperties #id').parent().attr('href', cpdb.cmpdLink.format(hitMol.id, cpdb.name === 'PADFrag' ? ['drug', 'fragment'][+(hitMol.id.charAt(3) === 'F')] : undefined));
@@ -491,14 +491,14 @@ $(() => {
 				const qryMol = qryMolecules[qryMolIdx];
 				drawSmiles(qryMol, 'qryMolCanvas2D');
 				refreshMolecule(qryMol, iviews[0]);
-				$('#qryMolProperties span').each(function () { // 'this' binding is used.
-					const t = $(this);
-					const prop = t.attr('id');
+				$('#qryMolProperties span').each((index, span) => {
+					const s = $(span);
+					const prop = s.attr('id');
 					const idx = ['tPSA', 'exactMW', 'clogP'].indexOf(prop);
 					if (idx === -1) {
-						t.text(qryMol[prop]);
+						s.text(qryMol[prop]);
 					} else {
-						t.text(qryMol[prop].toFixed(2 + idx)); // Display tPSA with 2 digits. Display exactMW with 3 digits. Display clogP with 4 digits.
+						s.text(qryMol[prop].toFixed(2 + idx)); // Display tPSA with 2 digits. Display exactMW with 3 digits. Display clogP with 4 digits.
 					}
 				});
 				refreshHitMol(0); // When the selected query molecule is changed, reset the selected hit molecule to the first.
@@ -514,8 +514,8 @@ $(() => {
 				if (qryMolIdxClicked == qryMolIdx) return;
 				refreshQryMol(qryMolIdxClicked);
 			});
-			$('#downloads a').each(function () { // 'this' binding is used.
-				$(this).click((e) => {
+			$('#downloads a').each((index, a) => {
+				$(a).click((e) => {
 					e.preventDefault();
 					const text = e.target.text;
 					saveAs(new Blob([text === 'hits.sdf' ? job.hitMolSdf : text === 'hits.csv' ? (() => { // Reconstruct hitMolCsv from hitMolSdf
