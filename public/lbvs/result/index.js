@@ -533,7 +533,7 @@ $(() => {
 	};
 	const queryArr = location.search.substr(1).split('&').map((kv) => {
 		const [ key, val ] = kv.split('=');
-		return { key, val };
+		return { key, val }; // { key: decodeURIComponent(key), val: decodeURIComponent(val) }
 	});
 	const jobIdKV = queryArr.find((kv) => {
 		return kv.key === 'id';
