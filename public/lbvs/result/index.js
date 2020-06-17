@@ -355,7 +355,7 @@ $(() => {
 					});
 				},
 			};
-			const parseSDF = (src) => {
+			const parseSdf = (src) => {
 				const molecules = [];
 				for (let lines = src.split(/\r\n|\n|\r/), l = lines.length - 1, offset = 0; offset < l;) {
 					const molecule = {
@@ -445,8 +445,8 @@ $(() => {
 			const cpdb = databases.find((cpdb) => {
 				return cpdb.name === job.database;
 			});
-			const qryMolecules = parseSDF(job.qryMolSdf);
-			const hitMolecules = parseSDF(job.hitMolSdf);
+			const qryMolecules = parseSdf(job.qryMolSdf);
+			const hitMolecules = parseSdf(job.hitMolSdf);
 			console.assert(qryMolecules.length === job.numQueries);
 			console.assert(hitMolecules.length === job.numQueries * numHits);
 			$('#qryMolIdsLabel').text(`${qryMolecules.length} query molecule${['', 's'][+(qryMolecules.length > 1)]}`);
