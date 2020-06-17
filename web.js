@@ -311,8 +311,9 @@ const cluster = require('cluster');
 				'startDate': 1,
 				'endDate': 1,
 				'hitMolSdf': 1,
-				'numQueries': 1,
-				'numConformers': 1,
+				'numQryMol': 1,
+				'numLibMol': 1,
+				'numLibCnf': 1,
 			},
 		});
 		res.json(resDoc);

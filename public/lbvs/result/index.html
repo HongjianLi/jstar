@@ -35,7 +35,7 @@
 	<main class="container">
 		<div>
 			<div class="table-responsive">
-				<table class="table table-dark table-hover text-center">
+				<table class="table table-dark text-center">
 					<thead>
 						<tr>
 							<th scope="col">Query file</th>
@@ -45,10 +45,9 @@
 							<th scope="col">Status</th>
 							<th scope="col">Start time</th>
 							<th scope="col">End time</th>
-							<th scope="col">Runtime</th>
 						</tr>
 					</thead>
-					<tbody id="jobInfo">
+					<tbody id="jobInfo1">
 						<tr>
 							<th scope="row"><a href=""><span id="filename"></span></a></th>
 							<td><span id="database"></span></td>
@@ -57,7 +56,26 @@
 							<td><span id="status"></span></td>
 							<td><span id="startTime"></span></td>
 							<td><span id="endTime"></span></td>
-							<td><span id="runtime"></span></td>
+						</tr>
+					</tbody>
+				</table>
+				<table class="table table-dark text-center">
+					<thead>
+						<tr>
+							<th scope="col"># of query molecules</th>
+							<th scope="col"># of library molecules screened</th>
+							<th scope="col"># of library conformers screened</th>
+							<th scope="col">Runtime</th>
+							<th scope="col">Screening speed</th>
+						</tr>
+					</thead>
+					<tbody id="jobInfo2">
+						<tr>
+							<td><span id="numQryMolStr"></span></td>
+							<td><span id="numLibMolStr"></span></td>
+							<td><span id="numLibCnfStr"></span></td>
+							<td><span id="runtimeStr"></span></td>
+							<td><span id="speedStr"></span></td>
 						</tr>
 					</tbody>
 				</table>

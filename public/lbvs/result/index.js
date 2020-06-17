@@ -77,12 +77,20 @@ $(() => {
 			return arguments[i]; // The arguments variable is from the String.prototype.format, not from the anonymous lambda function.
 		});
 	}
+	const d3 = /(\d+)(\d{3})/;
+	Number.prototype.thousandize = function () {
+		let s = this.toString();
+		while (d3.test(s)) {
+			s = s.replace(d3, '$1,$2');
+		}
+		return s;
+	};
 	let tickCount = 0;
 	const tick = (jobId) => {
 		$.get('/lbvs/job', { id: jobId }, (job) => {
 			if (!job || !job.submitDate) return; // null will be returned if no job matching the id is found. { error: [] } will be returned if the job id fails the server side validation.
 			if (++tickCount === 1) {
-				$('#jobInfo #filename').parent().click((e) => {
+				$('#jobInfo1 #filename').parent().click((e) => {
 					e.preventDefault();
 					saveAs(new Blob([job.qryMolSdf], { type: 'text/plain;charset=utf-8' }), job.filename);
 				});
@@ -93,24 +101,28 @@ $(() => {
 				job[key.replace('Date', 'Time')] = $.format.date(job[key], 'HH:mm:ss.SSS'); // Save the time format to a new key, e.g. submitDate -> submitTime
 			});
 			if (job.endDate) {
-				['numQueries', 'numConformers'].forEach((key) => {
+				['numQryMol', 'numLibMol', 'numLibCnf'].forEach((key) => {
 					job[key] = parseInt(job[key]);
+					job[key + 'Str'] = job[key].thousandize();
 				});
 				job.runtime = (job.endDate - job.startDate) * 1e-3; // in seconds.
-				job.speed = job.numConformers * job.numQueries * 1e-3 / job.runtime; // in K conformers per second.
-				job.runtime = `${job.runtime.toFixed(3)} s`; // Format runtime to an expressive string.
+				job.runtimeStr = `${job.runtime.toFixed(3)} s`; // Format runtime to an expressive string.
+				job.speed = job.numLibCnf * job.numQryMol * 1e-3 / job.runtime; // in K conformers per second.
+				job.speedStr = `${job.speed.toFixed(2)} K conformers / s`;
 				job.status = 'Completed';
 			} else {
 				job.status = ['Executing', 'Queued'][+!job.startDate];
 				$('#results').hide();
 			}
-			$('#jobInfo span').each((index, span) => {
+			const jobInfoSpanCb = (index, span) => {
 				const s = $(span);
 				const t = job[s.attr('id')];
 				if (t && s.text() !== t) {
 					s.text(t).hide().fadeIn('slow');
 				}
-			});
+			};
+			$('#jobInfo1 span').each(jobInfoSpanCb);
+			$('#jobInfo2 span').each(jobInfoSpanCb);
 			if (!job.endDate) {
 				setTimeout(() => { tick(jobId); }, 1000);
 				return;
@@ -452,8 +464,8 @@ $(() => {
 					});
 				});
 			});
-			console.assert(qryMolecules.length === job.numQueries);
-			console.assert(hitMolecules.length === job.numQueries * numHits);
+			console.assert(qryMolecules.length === job.numQryMol);
+			console.assert(hitMolecules.length === job.numQryMol * numHits);
 			$('#qryMolIdsLabel').text(`${qryMolecules.length} query molecule${['', 's'][+(qryMolecules.length > 1)]}`);
 			$('#hitMolIdsLabel').text(`${numHits} hit molecules sorted by ${job.score} score`);
 			const hitMolIds = $('#hitMolIds');
