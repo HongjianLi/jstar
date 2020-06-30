@@ -362,6 +362,13 @@ const cluster = require('cluster');
 			reqDoc.qryMolSdf = validateStdout.toString();
 			reqDoc.submitDate = new Date();
 			lbvs.insertOne(reqDoc, (err, cmdRes) => {
+				if (err) {
+					console.error(err);
+					res.json({
+						error: err,
+					});
+					return;
+				}
 				assert.equal(cmdRes.insertedCount, 1);
 				res.json({
 					id: cmdRes.insertedId,
