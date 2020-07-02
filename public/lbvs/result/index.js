@@ -128,45 +128,6 @@ $(() => {
 				return;
 			}
 			$('#results').show();
-			const gaugeScreeningSpeed = echarts.init(document.getElementById('gaugeScreeningSpeed'));
-			gaugeScreeningSpeed.setOption({
-				series: [{
-					name: 'Screening speed',
-					type: 'gauge',
-					min: 0,
-					max: 60,
-					splitNumber: 12,
-//					radius: '100%',
-					axisLine: {
-						lineStyle: {
-							color: [[1/6, '#91c7ae'], [5/6, '#63869e'], [1, '#c23531']],
-							width: 8,
-						},
-					},
-					axisTick: {
-						length: 15,
-					},
-					splitLine: {
-						length: 20,
-						lineStyle: {
-							color: 'auto',
-						},
-					},
-					title: {
-						fontWeight: 'bold',
-					},
-					detail: {
-						formatter: (value) => {
-							return value.toFixed(2);
-						},
-						fontWeight: 'bold',
-					},
-					data: [{
-						value: job.speed,
-						name: 'Thousand\nconformers / s',
-					}],
-				}],
-			});
 			const { jview, parseSdf } = jstar;
 			const refreshMolecule = (molecule, jv) => {
 				if (molecule.representations === undefined) {
