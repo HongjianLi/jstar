@@ -26,14 +26,14 @@
 		"node": ">=12.16.0"
 	},
 	"dependencies": {
-		"ajv": ">=6.0.0",
+		"ajv": "^6.12.5",
 		"compression": "^1.7.4",
 		"errorhandler": "^1.5.1",
 		"express": ">=4.17.0",
-		"mongodb": "^3.5.9",
+		"mongodb": "^3.6.2",
 		"serve-favicon": ">=2.5.0",
 		"spdy": "^4.0.2",
-		"uuid": "^8.2.0"
+		"uuid": "^8.3.0"
 	},
 	"main": "web.js",
 	"scripts": {
