@@ -107,8 +107,8 @@ $(() => {
 				});
 				job.runtime = (job.endDate - job.startDate) * 1e-3; // in seconds.
 				job.runtimeStr = `${job.runtime.toFixed(3)} s`; // Format runtime to an expressive string.
-				job.speed = job.numLibCnf * job.numQryMol * 1e-3 / job.runtime; // in K conformers per second.
-				job.speedStr = `${job.speed.toFixed(2)} K conformers / s`;
+				job.speed = job.numLibCnf * job.numQryMol / job.runtime; // in conformers per second.
+				job.speedStr = `${parseInt(job.speed.toFixed(0)).thousandize()} conformers / s`;
 				job.status = 'Completed';
 			} else {
 				job.status = ['Executing', 'Queued'][+!job.startDate];
