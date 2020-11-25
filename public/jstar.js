@@ -107,7 +107,7 @@
 				me.sf = me.cf + dy * 100;
 			} else if (e.ctrlKey || me.wh == 3) { // Translate
 				const scaleFactor = Math.max((me.rot.position.z - me.camera.position.z) * 0.85, 20);
-				me.mdl.position.copy(me.cp).add(new THREE.Vector3(-dx * scaleFactor, -dy * scaleFactor, 0).applyQuaternion(me.rot.quaternion.clone().inverse().normalize()));
+				me.mdl.position.copy(me.cp).add(new THREE.Vector3(-dx * scaleFactor, -dy * scaleFactor, 0).applyQuaternion(me.rot.quaternion.clone().invert().normalize()));
 			} else if (e.shiftKey || me.wh == 2) { // Zoom
 				const scaleFactor = Math.max((me.rot.position.z - me.camera.position.z) * 0.85, 80);
 				me.rot.position.z = me.cz - dy * scaleFactor;
