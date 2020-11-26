@@ -107,7 +107,7 @@ const cluster = require('cluster');
 		const numWorkerProcesses = 4;
 		console.log('Forking %d worker processes', numWorkerProcesses);
 		function messageHandler (msg) { // Cannot use lambda function => because of 'this' binding. The 'this.send()' statement requires capturing the worker process.
-			if (msg.query === '/data/count') {
+			if (msg.query === '/cmpd/count') {
 				const { s2m } = msg; // slave to master.
 				const db = databases.find((db) => {
 					return db.name === s2m.db;
@@ -209,7 +209,7 @@ const cluster = require('cluster');
 		validate[ns.name] = ajv.compile(ns.schema);
 	});
 	// Get the number of compounds satisfying filtering conditions
-	app.route('/data/count').get((req, res) => {
+	app.route('/cmpd/count').get((req, res) => {
 		// Validate and sanitize user input
 /*		let v = new validator(req.query);
 		if (v
@@ -239,7 +239,7 @@ const cluster = require('cluster');
 		// Send query to master process
 		const s2mMsg = {
 			uuid: uuid.v4(), // Version 4 (random) - Created from cryptographically-strong random values. Version 1 (timestamp) - Created from the system clock (plus random values).
-			query: '/data/count',
+			query: '/cmpd/count',
 			s2m: {
 				db: 'WITHDRAWN',
 				descriptors: [{ // natm
