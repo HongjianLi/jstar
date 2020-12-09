@@ -25,7 +25,7 @@ $(() => {
 		cmpdLink: 'https://www.surechembl.org/search/',
 	}, {
 		name: 'COCONUT',
-		cmpdLink: 'https://zenodo.org/record/3747531',
+		cmpdLink: 'https://coconut.naturalproducts.net/',
 	}, {
 		name: 'Pfizer',
 		cmpdLink: 'https://www.pfizer.com/',

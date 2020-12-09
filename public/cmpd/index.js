@@ -377,7 +377,7 @@ $(() => {
 		}],
 	},{
 		name: 'COCONUT',
-		link: 'https://zenodo.org/record/3747531',
+		link: 'https://coconut.naturalproducts.net/',
 		version: '3',
 		accessDate: '2020-04-11',
 		numCompounds: 198224,
