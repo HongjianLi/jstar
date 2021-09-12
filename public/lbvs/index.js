@@ -3,8 +3,8 @@ $(() => {
 	const qryMolSdfLabel = $('#qryMolSdfLabel');
 	$('#submit').click(() => {
 		const qryMolSdfFile = $('#qryMolSdf').get(0).files[0];
-		if (qryMolSdfFile === undefined || qryMolSdfFile.size > 50000) {
-			qryMolSdfLabel.tooltip('dispose').attr('title', ['Maximum 50KB', 'No file selected'][+!qryMolSdfFile]).tooltip('show');
+		if (qryMolSdfFile === undefined || qryMolSdfFile.size > 500000) {
+			qryMolSdfLabel.tooltip('dispose').attr('title', ['Maximum 500KB', 'No file selected'][+!qryMolSdfFile]).tooltip('show');
 			return;
 		}
 		const reader = new FileReader();
