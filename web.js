@@ -156,7 +156,7 @@ const cluster = require('cluster');
 	const errorHandler = require('errorhandler');
 	const app = express();
 //	app.use(compress());
-	app.use(bodyParser.urlencoded({ limit: '60kb', extended: false }));
+	app.use(bodyParser.urlencoded({ limit: '600kb', extended: false }));
 	app.use(errorHandler({ dumpExceptions: true, showStack: true }));
 	app.use(express.static(__dirname + '/public'));
 	app.use(favicon(__dirname + '/public/favicon.ico'));
