@@ -33,7 +33,7 @@
 		"mongodb": "^3.6.3",
 		"serve-favicon": ">=2.5.0",
 		"spdy": "^4.0.2",
-		"uuid": "^8.3.1"
+		"uuid": "^8.3.2"
 	},
 	"main": "web.js",
 	"scripts": {
