@@ -338,7 +338,7 @@ const cluster = require('cluster');
 				res.json({
 					code,
 					signal,
-					error: 'Unsupported SDF file',
+					error: 'File not conform to the required SDF format',
 				});
 				return;
 			}
