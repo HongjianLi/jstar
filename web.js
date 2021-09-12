@@ -192,7 +192,7 @@ const cluster = require('cluster');
 				qryMolSdf: { // Caution NoSQL injection
 					type: 'string',
 					minLength: 1,
-					maxLength: 50000,
+					maxLength: 500000,
 				},
 				database: {
 					type: 'string',
