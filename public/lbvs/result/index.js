@@ -183,16 +183,16 @@ $(() => {
 					});
 				});
 			});
-			console.assert(qryMolecules.length === job.numQryMol);
+			console.assert(qryMolecules.length >= job.numQryMol); // qryMolecules.length is the number of query molecules submitted by the user. job.numQryMol is the number of query molecules processed by the daemon.
 			console.assert(hitMolecules.length === job.numQryMol * numHits);
-			$('#qryMolIdsLabel').text(`${qryMolecules.length} query molecule${['', 's'][+(qryMolecules.length > 1)]}`);
+			$('#qryMolIdsLabel').text(`${job.numQryMol} query molecule${['', 's'][+(job.numQryMol > 1)]} processed, out of ${qryMolecules.length} submitted by the user`);
 			$('#hitMolIdsLabel').text(`${numHits} hit molecules sorted by ${job.score} score`);
 			const hitMolIds = $('#hitMolIds');
 			const qryMolIds = $('#qryMolIds');
 			hitMolIds.html([...Array(numHits).keys()].map((index) => { // hitMolecules.slice(numHits * qryMolIdx, numHits * (1 + qryMolIdx)).map((hitMol, index) => {});
 				return `<button type="button" class="btn">${index}</button>`;
 			}).join(''));
-			qryMolIds.html(qryMolecules.map((qryMol, index) => {
+			qryMolIds.html([...Array(job.numQryMol).keys()].map((index) => {
 				return `<button type="button" class="btn">${index}</button>`;
 			}).join(''));
 			let qryMolIdx = 0, hitMolIdx = 0;
