@@ -7,6 +7,8 @@
 	<meta name="description" content="jstar: a modern website for hosting drug discovery services">
 	<title>jstar: drug discovery services</title>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@4.6.0/dist/darkly/bootstrap.min.css" integrity="sha256-CETRC0luEnm32Z1z91BT8xqiKfIzbspZ64YCq3T63xk=" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intro.js@4.2.2/minified/introjs.min.css" integrity="sha256-r+KU+EGw8U9Q4Ij/dzbGzPKNtOjcSYJJgtWFKtGhVLg=" crossorigin="anonymous">
+	<link rel="stylesheet" href="/introjs-jstar.css">
 	<link rel="stylesheet" href="/index.css">
 	<link rel="icon" href="/favicon.ico">
 	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-125619081-1"></script>
@@ -32,14 +34,14 @@
 		<h3><a href="/"><img src="/logo.svg" alt="logo"><strong>jstar</strong></a></h3>
 	</header>
 	<main class="container">
-		<section>
+		<section data-intro="Here are four simple steps to run a ligand-based virtual screen.">
 			<h4>Run a virtual screen</h4>
 			<div class="row" role="form">
-				<div class="col-4 form-group">
+				<div class="col-4 form-group" data-intro="Step 1. Provide a SDF file (max 500KB) containing 3D coordinates of some query compounds, which are usually known bioactives of interest.">
 					<label for="qryMolSdf"><a data-toggle="tooltip" id="qryMolSdfLabel">1) Select query compounds in 3D SDF format</a></label>
 					<input type="file" class="btn btn-primary" id="qryMolSdf">
 				</div>
-				<div class="col-3 form-group">
+				<div class="col-3 form-group" data-intro="Step 2. Select one of the <a href='/cmpd'>compound databases available at jstar</a> to screen.">
 					<label for="database">2) Select a database to screen</label>
 					<select class="form-control btn-primary" id="database">
 						<option>ZINC</option>
@@ -68,14 +70,14 @@
 						<option>WITHDRAWN</option>
 					</select>
 				</div>
-				<div class="col-3 form-group">
+				<div class="col-3 form-group" data-intro="Step 3. Select either <a href='https://doi.org/10.1002/jcc.20681'>USR</a> or <a href='https://doi.org/10.1186/1758-2946-4-27'>USRCAT</a> score for ranking the database compounds. USR considers 3D molecular shape, while USRCAT considers pharmacophoric features too.">
 					<label for="score">3) Select a score to rank compounds</label>
 					<select class="form-control btn-primary" id="score">
 						<option>USR</option>
 						<option>USRCAT</option>
 					</select>
 				</div>
-				<div class="col-2 form-group">
+				<div class="col-2 form-group" data-intro="Step 4. Submit your job. Once successful, you will be redirected to the result page with a unique URL which you can bookmark. However, an error could occur if<ul><li>no file is selected.</li><li>the file size exceeds 500KB.</li><li>the file is not in SDF format.</li><li>the SDF content cannot be parsed.</li></ul>">
 					<label for="submit">4) Go</label>
 					<div class="input-group">
 						<button class="btn btn-primary" id="submit">Submit</button>
@@ -92,11 +94,12 @@
 		</section>
 	</main>
 	<footer>
-		<p>&copy; 2020-2021 Chinese University of Hong Kong. Platform designed by <a href="https://github.com/HongjianLi">Hongjian Li</a></p>
+		<p>&copy; 2020-2021 Chinese University of Hong Kong &nbsp; | &nbsp; Free, <a href="https://github.com/HongjianLi/jstar">open source</a>, no login requirement &nbsp; | &nbsp; <a href="" id="tutorial">Click to start a tutorial</a></p>
 	</footer>
 	<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha256-/ijcOLwFf26xEYAjW75FizKVo5tnTYiQddPZoLUHHZ8=" crossorigin="anonymous"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" integrity="sha256-7dA7lq5P94hkBsWdff7qobYkp9ope/L5LQy2t/ljPLo=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/intro.js@4.2.2/minified/intro.min.js" integrity="sha256-TIv9PRYb23rraRLu4N1NTfU+k8InegzoVqPqIIiNhX0=" crossorigin="anonymous"></script>
 	<script src="index.js"></script>
 </body>
 </html>

@@ -7,6 +7,8 @@
 	<meta name="description" content="jstar: a modern website for hosting drug discovery services">
 	<title>jstar: drug discovery services</title>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@4.6.0/dist/darkly/bootstrap.min.css" integrity="sha256-CETRC0luEnm32Z1z91BT8xqiKfIzbspZ64YCq3T63xk=" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intro.js@4.2.2/minified/introjs.min.css" integrity="sha256-r+KU+EGw8U9Q4Ij/dzbGzPKNtOjcSYJJgtWFKtGhVLg=" crossorigin="anonymous">
+	<link rel="stylesheet" href="/introjs-jstar.css">
 	<link rel="stylesheet" href="/index.css">
 	<link rel="icon" href="/favicon.ico">
 	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-125619081-1"></script>
@@ -34,7 +36,7 @@
 	<main class="container">
 		<div>
 			<div class="table-responsive">
-				<table class="table table-dark text-center">
+				<table class="table table-dark text-center" data-intro="This table shows the input settings, current status, and key timepoints of the virtual screen.">
 					<thead>
 						<tr>
 							<th scope="col">Query file</th>
@@ -48,17 +50,17 @@
 					</thead>
 					<tbody id="jobInfo1">
 						<tr>
-							<th scope="row"><a href=""><span id="filename"></span></a></th>
-							<td><span id="database"></span></td>
-							<td><span id="score"></span></td>
-							<td><span id="submitTime"></span></td>
-							<td><span id="status"></span></td>
-							<td><span id="startTime"></span></td>
-							<td><span id="endTime"></span></td>
+							<td data-intro="The user-submitted query file in SDF format. The filename is truncated to 20 characters."><a href=""><span id="filename"></span></a></td>
+							<td data-intro="The user-selected compound database."><span id="database"></span></td>
+							<td data-intro="The user-selected score for ranking compounds."><span id="score"></span></td>
+							<td data-intro="The local time when the virtual screen was submitted, in millisecond precision."><span id="submitTime"></span></td>
+							<td data-intro="The status can be either<ul><li>Queued</li><li>Executing</li><li>Completed</li></ul>"><span id="status"></span></td>
+							<td data-intro="The local time when the virtual screen was started to execute. It is only available when the status is Executing or Completed."><span id="startTime"></span></td>
+							<td data-intro="The local time when the virtual screen was completed. It is only available when the status is Completed."><span id="endTime"></span></td>
 						</tr>
 					</tbody>
 				</table>
-				<table class="table table-dark text-center">
+				<table class="table table-dark text-center" data-intro="This table shows the processing details of the virtual screen.">
 					<thead>
 						<tr>
 							<th scope="col">#Query molecules</th>
@@ -70,43 +72,43 @@
 					</thead>
 					<tbody id="jobInfo2">
 						<tr>
-							<td><span id="numQryMolStr"></span></td>
-							<td><span id="numLibMolStr"></span></td>
-							<td><span id="numLibCnfStr"></span></td>
-							<td><span id="runtimeStr"></span></td>
-							<td><span id="speedStr"></span></td>
+							<td data-intro="The number of query molecules actually processed. It depends on the final output file size. It is equal to or less than the number of query molecules submitted by the user."><span id="numQryMolStr"></span></td>
+							<td data-intro="The number of molecules of the user-selected compound database."><span id="numLibMolStr"></span></td>
+							<td data-intro="The number of pre-generated, low-energy, 3D conformers of the user-selected compound database."><span id="numLibCnfStr"></span></td>
+							<td data-intro="The runtime of the virtual screen, in seconds. It is calculated via subtracting the end time by the start time. It includes the time spent in<ul><li>reading the query molecules</li><li>calculating their feature vectors</li><li>enumerating the precalculated feature vectors of database compounds in parallel</li><li>calculating the score of two feature vectors</li><li>ranking the database compounds</li><li>writing the top hits</li></ul>"><span id="runtimeStr"></span></td>
+							<td data-intro="The screening speed is calculated via dividing the total number of conformers actually screened by the runtime.<br><br><i>Screening speed</i> = <i>#Conformers screened</i> * <i>#Query molecules</i> / <i>Runtime</i>"><span id="speedStr"></span></td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
 		</div>
-		<div id="results">
+		<div id="results" data-intro="The left panel shows the query molecule.<br>The right panel shows the hit molecule.">
 			<div class="row">
 				<div class="col-lg-6">
-					<canvas id="qryMolCanvas2D"></canvas>
+					<canvas id="qryMolCanvas2D" data-intro="2D canvas drawing the selected query molecule."></canvas>
 				</div>
 				<div class="col-lg-6">
-					<canvas id="hitMolCanvas2D"></canvas>
+					<canvas id="hitMolCanvas2D" data-intro="2D canvas drawing the selected hit molecule."></canvas>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-lg-6">
-					<canvas id="qryMolCanvas3D"></canvas>
+					<canvas id="qryMolCanvas3D" data-intro="3D canvas drawing the selected query molecule."></canvas>
 				</div>
 				<div class="col-lg-6">
-					<canvas id="hitMolCanvas3D"></canvas>
+					<canvas id="hitMolCanvas3D" data-intro="3D canvas drawing the selected hit molecule."></canvas>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-lg-5">
 					<div class="form-group">
-						<label id="qryMolIdsLabel"></label>
+						<label id="qryMolIdsLabel" data-intro="The number of query molecules actually processed depends on the final output file size. It is equal to or less than the number of query molecules submitted by the user."></label>
 						<div>
-							<div class="btn-group btn-group-sm btn-group-x" data-toggle="buttons" id="qryMolIds" role="group" aria-label="Button group of query molecules"></div>
+							<div class="btn-group btn-group-sm btn-group-x" data-toggle="buttons" id="qryMolIds" role="group" aria-label="Button group of query molecules" data-intro="Click the buttons to select among multiple query molecules, which are represented by 0-based indexes, e.g. the 0 or 1 button represents the first or the second query molecule, respectively. When an alternative query molecule is selected, the four canvases will be refreshed and the hit molecule will be reset to the first hit."></div>
 						</div>
 					</div>
 				</div>
-				<div class="col-lg-1">
+				<div class="col-lg-1" data-intro="Click to export both the 2D and 3D canvases of the query molecule to a PNG file.">
 					<div class="form-group">
 						<label>PNG</label>
 						<div>
@@ -116,13 +118,13 @@
 				</div>
 				<div class="col-lg-5">
 					<div class="form-group">
-						<label id="hitMolIdsLabel"></label>
+						<label id="hitMolIdsLabel" data-intro="Total 100 hit molecules for each processed query molecule were returned. They were sorted by the selected score."></label>
 						<div>
-							<div class="btn-group btn-group-sm btn-group-x" data-toggle="buttons" id="hitMolIds" role="group" aria-label="Button group of hit molecules"></div>
+							<div class="btn-group btn-group-sm btn-group-x" data-toggle="buttons" id="hitMolIds" role="group" aria-label="Button group of hit molecules" data-intro="Click the buttons to select among multiple hit molecules. When an alternative hit molecule is selected, the two canvases drawing the hit molecule will be refreshed."></div>
 						</div>
 					</div>
 				</div>
-				<div class="col-lg-1">
+				<div class="col-lg-1" data-intro="Click to export both the 2D and 3D canvases of the hit molecule to a PNG file.">
 					<div class="form-group">
 						<label>PNG</label>
 						<div>
@@ -132,7 +134,7 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-lg-4 break-word" id="qryMolProperties">
+				<div class="col-lg-4 break-word" id="qryMolProperties" data-intro="Information about the selected query molecule. The ID was extracted from the user-submitted SDF file, while the other fields were computed on the fly.">
 					<p>The selected query molecule</p>
 					<ul>
 						<li>ID: <span id="qryMol_id"></span></li>
@@ -149,27 +151,33 @@
 					</ul>
 				</div>
 				<div class="col-lg-4 break-word" id="hitMolScores">
-					<p>Similarities of the hit molecule to the query molecule</p>
-					<ul>
-						<li>USR score: <span id="hitMol_usrScore"></span></li>
-						<li>USRCAT score: <span id="hitMol_usrcatScore"></span></li>
-						<li>Tanimoto score: <span id="hitMol_tanimotoScore"></span></li>
-					</ul>
-					<p>Hit molecules for download</p>
-					<ul id="downloads">
-						<li><a href="#">hits.sdf</a></li>
-						<li><a href="#">hits.csv</a></li>
-					</ul>
-					<p>Keyings & references</p>
-					<ul>
-						<li>Default: rotate</li>
-						<li>Ctrl: translate</li>
-						<li>Shift: zoom</li>
-						<li>Ctrl + shift: clip</li>
-						<li><a href="https://doi.org/10.1186/1471-2105-15-56">Li et al. 2014</a></li>
-					</ul>
+					<div data-intro="3D and 2D similarity scores between the selected query molecule and the selected hit molecule.">
+						<p>Similarities of the hit molecule to the query molecule</p>
+						<ul>
+							<li>USR score: <span id="hitMol_usrScore"></span></li>
+							<li>USRCAT score: <span id="hitMol_usrcatScore"></span></li>
+							<li data-intro="Tanimoto score of the Morgan fingerprints with a radius of 2.">Tanimoto score: <span id="hitMol_tanimotoScore"></span></li>
+						</ul>
+					</div>
+					<div data-intro="The output files in both SDF and CSV formats contain 100 hits for each of the processed query molecule.">
+						<p>Hit molecules for download</p>
+						<ul id="downloads">
+							<li><a href="">hits.sdf</a></li>
+							<li><a href="">hits.csv</a></li>
+						</ul>
+					</div>
+					<div data-intro="Press these keys to interactively manipulate the 3D canvases">
+						<p>Keyings for the 3D interactive canvases</p>
+						<ul>
+							<li>Default: rotate</li>
+							<li>Ctrl: translate</li>
+							<li>Shift: zoom</li>
+							<li>Ctrl + shift: clip</li>
+							<li><a href="https://doi.org/10.1186/1471-2105-15-56">Li et al. 2014</a></li>
+						</ul>
+					</div>
 				</div>
-				<div class="col-lg-4 break-word" id="hitMolProperties">
+				<div class="col-lg-4 break-word" id="hitMolProperties" data-intro="Information about the selected hit molecule. Click the ID link to navigate to the third-party database website for purchase.">
 					<p>The selected hit molecule</p>
 					<ul>
 						<li>ID: <a href="" target="_blank" rel="noreferrer"><span id="hitMol_id"></span></a></li>
@@ -189,7 +197,7 @@
 		</div>
 	</main>
 	<footer>
-		<p>&copy; 2020-2021 Chinese University of Hong Kong. Platform designed by <a href="https://github.com/HongjianLi">Hongjian Li</a></p>
+		<p>&copy; 2020-2021 Chinese University of Hong Kong &nbsp; | &nbsp; Free, <a href="https://github.com/HongjianLi/jstar">open source</a>, no login requirement &nbsp; | &nbsp; <a href="" id="tutorial">Click to start a tutorial</a></p>
 	</footer>
 	<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha256-/ijcOLwFf26xEYAjW75FizKVo5tnTYiQddPZoLUHHZ8=" crossorigin="anonymous"></script>
@@ -198,6 +206,7 @@
 	<script src="https://cdn.jsdelivr.net/npm/three@0.133.1/build/three.min.js" integrity="sha256-gNSsallukcRgPh74crEJrvapucNw7iool4Q1pH29PVc=" crossorigin="anonymous"></script>
 	<script src="https://cdn.jsdelivr.net/npm/smiles-drawer@1.2.0/dist/smiles-drawer.min.js" integrity="sha256-xwUPmrnpnwABJ3oEm1I7+0V5GerXl8n1Sp1oNGTO0yU=" crossorigin="anonymous"></script>
 	<script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js" integrity="sha256-xoh0y6ov0WULfXcLMoaA6nZfszdgI8w2CEJ/3k8NBIE=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/intro.js@4.2.2/minified/intro.min.js" integrity="sha256-TIv9PRYb23rraRLu4N1NTfU+k8InegzoVqPqIIiNhX0=" crossorigin="anonymous"></script>
 	<script src="/jstar.js"></script>
 	<script src="index.js"></script>
 </body>

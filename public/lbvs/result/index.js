@@ -272,4 +272,9 @@ $(() => {
 	if (jobIdKV) {
 		tick(jobIdKV.val);
 	}
+	const intro = introJs();
+	$('#tutorial').click((e) => {
+		e.preventDefault();
+		intro.start();
+	});
 });
