@@ -4,7 +4,7 @@ $(() => {
 		cmpdLink: 'https://zinc15.docking.org/substances/{0}/',
 	}, {
 		name: 'SCUBIDOO',
-		cmpdLink: 'http://www.kolblab.org/scubidoo/controller/search_reactant.php?r1_id={0}',
+		cmpdLink: 'https://scubidoo.pharmazie.uni-marburg.de/controller/search_product_temp.php?id={0}',
 	}, {
 		name: 'GDBMedChem',
 		cmpdLink: 'http://gdb.unibe.ch/downloads/',
