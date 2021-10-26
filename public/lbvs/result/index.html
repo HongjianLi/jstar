@@ -74,8 +74,8 @@
 						<tr>
 							<td data-intro="The number of query molecules actually processed. It depends on the final output file size. It is equal to or less than the number of query molecules submitted by the user."><span id="numQryMolStr"></span></td>
 							<td data-intro="The number of molecules of the user-selected compound database."><span id="numLibMolStr"></span></td>
-							<td data-intro="The number of pre-generated, low-energy, 3D conformers of the user-selected compound database."><span id="numLibCnfStr"></span></td>
-							<td data-intro="The runtime of the virtual screen, in seconds. It is calculated via subtracting the end time by the start time. It includes the time spent in<ul><li>reading the query molecules</li><li>calculating their feature vectors</li><li>enumerating the precalculated feature vectors of database compounds in parallel</li><li>calculating the score of two feature vectors</li><li>ranking the database compounds</li><li>writing the top hits</li></ul>"><span id="runtimeStr"></span></td>
+							<td data-intro="The number of pre-generated, energy-minimized, 3D conformers of the user-selected compound database."><span id="numLibCnfStr"></span></td>
+							<td data-intro="The runtime of the virtual screen, in seconds. It is calculated via subtracting the end time by the start time. It includes the time spent in<ul><li>reading the query molecules</li><li>calculating their feature vectors</li><li>enumerating the precalculated feature vectors of database compounds in parallel</li><li>calculating the score of two feature vectors</li><li>ranking the database compounds</li><li>aligning the top hits to the query</li><li>writing the top hits</li></ul>"><span id="runtimeStr"></span></td>
 							<td data-intro="The screening speed is calculated via dividing the total number of conformers actually screened by the runtime.<br><br><i>Screening speed</i> = <i>#Conformers screened</i> * <i>#Query molecules</i> / <i>Runtime</i>"><span id="speedStr"></span></td>
 						</tr>
 					</tbody>
@@ -173,7 +173,6 @@
 							<li>Ctrl: translate</li>
 							<li>Shift: zoom</li>
 							<li>Ctrl + shift: clip</li>
-							<li><a href="https://doi.org/10.1186/1471-2105-15-56">Li et al. 2014</a></li>
 						</ul>
 					</div>
 				</div>
