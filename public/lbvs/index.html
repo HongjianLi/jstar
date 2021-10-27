@@ -35,11 +35,12 @@
 	</header>
 	<main class="container">
 		<section data-intro="Here are four simple steps to run a ligand-based virtual screen.">
-			<h4>Run a virtual screen</h4>
+			<h4>Run a virtual screen (<a href="help">Help</a>)</h4>
 			<div class="row" role="form">
 				<div class="col-4 form-group" data-intro="Step 1. Provide a SDF file (max 500KB) containing 3D coordinates of some query compounds, which are usually known bioactives of interest.">
 					<label for="qryMolSdf"><a data-toggle="tooltip" id="qryMolSdfLabel">1) Select query compounds in 3D SDF format</a></label>
 					<input type="file" class="btn btn-primary" id="qryMolSdf">
+					<p>Examples: <a href="molnupiravir.sdf">molnupiravir</a>, <a href="vemurafenib.sdf">vemurafenib</a>, <a href="fluspirilene.sdf">fluspirilene</a></p>
 				</div>
 				<div class="col-3 form-group" data-intro="Step 2. Select one of the <a href='/cmpd'>compound databases available at jstar</a> to screen.">
 					<label for="database">2) Select a database to screen</label>
@@ -77,20 +78,13 @@
 						<option>USRCAT</option>
 					</select>
 				</div>
-				<div class="col-2 form-group" data-intro="Step 4. Submit your job. Once successful, you will be redirected to the result page with a unique URL which you can bookmark. However, an error could occur if<ul><li>no file is selected.</li><li>the file size exceeds 500KB.</li><li>the file is not in SDF format.</li><li>the SDF content cannot be parsed.</li></ul>">
+				<div class="col-2 form-group" data-intro="Step 4. Submit your virtual screen. Once successful, you will be redirected to the result page with a unique URL which you can bookmark. However, an error could occur if<ul><li>no file is selected.</li><li>the file size exceeds 500KB.</li><li>the file is not in SDF format.</li><li>the SDF content cannot be parsed.</li></ul>">
 					<label for="submit">4) Go</label>
 					<div class="input-group">
 						<button class="btn btn-primary" id="submit">Submit</button>
 					</div>
 				</div>
 			</div>
-		</section>
-		<hr />
-		<section>
-			<h4>References</h4>
-			<p>Webservers: <a href="https://doi.org/10.1093/nar/gkw320">Li et al. 2016</a></p>
-			<p>Algorithms: <a href="https://doi.org/10.1186/1758-2946-4-27">Schreyer et al. 2012</a> | <a href="https://doi.org/10.4155/fmc.10.280">Ballester et al. 2011</a> | <a href="https://doi.org/10.1002/jcc.20681">Ballester et al. 2007</a></p>
-			<p>Applications: <a href="https://doi.org/10.1016/j.ejmech.2014.08.060">Hoeger et al. 2014</a> | <a href="https://doi.org/10.1007/s10822-014-9732-4">Patil et al. 2014</a> | <a href="https://doi.org/10.4172/2153-0769.1000118">Teo et al. 2013</a> | <a href="https://doi.org/10.1098/rsif.2012.0569">Ballester et al. 2012</a> | <a href="https://doi.org/10.1098/rsif.2009.0170">Ballester et al. 2010</a> | <a href="https://doi.org/10.1021/jm801622x">Li et al. 2009</a></p>
 		</section>
 	</main>
 	<footer>
