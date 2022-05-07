@@ -175,6 +175,7 @@ $(() => {
 			const hitMolecules = parseSdf(job.hitMolSdf);
 			const rdkit = await initRDKitModule();
 			job.hitMolSdf.split(/\$\$\$\$\r?\n/).filter(s => s.length).map(s => s + '$$$$\n').forEach((hitSdf, i) => {
+				if (hitMolecules[i]['canonicalSMILES']) return;
 				const hitMol = rdkit.get_mol(hitSdf);
 				const hitMolNoH = rdkit.get_mol(hitMol.remove_hs());
 //				const hitDes = JSON.parse(hitMol.get_descriptors());
