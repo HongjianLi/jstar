@@ -302,7 +302,7 @@ if (cluster.isPrimary) {
 			return;
 		}
 		const resDoc = await lbvs.findOne({
-			_id: new mongodb.ObjectID(reqDoc.id),
+			_id: new mongodb.ObjectId(reqDoc.id),
 		}, {
 			projection: {
 				'_id': 0,
