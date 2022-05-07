@@ -18,12 +18,12 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 if (cluster.isPrimary) {
 	const descriptors = ['natm.u16', 'nhbd.u16', 'nhba.u16', 'nrtb.u16', 'nrng.u16', 'xmwt.f32', 'tpsa.f32', 'clgp.f32'].map((descriptor) => {
-		const type = descriptor.substr(5);
+		const type = descriptor.substring(5);
 		return {
 			file: descriptor,
-			name: descriptor.substr(0, 4),
+			name: descriptor.substring(0, 4),
 			type,
-			size: parseInt(type.substr(1)) / 8,
+			size: parseInt(type.substring(1)) / 8,
 			func: ['readUInt16LE', 'readFloatLE'][['u16', 'f32'].indexOf(type)],
 		};
 	});
