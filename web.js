@@ -144,7 +144,8 @@ const cluster = require('cluster');
 	}
 	// Connect to MongoDB
 	const mongodb = require('mongodb');
-	const mongoClient = await mongodb.MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true, useUnifiedTopology: true }); // poolSize is 5 by default.
+	const mongoClient = new mongodb.MongoClient(`mongodb://localhost:27017/?authSource=jstar&maxPoolSize=3`); // https://www.mongodb.com/docs/drivers/node/current/fundamentals/connection/ Always URI encode the username and password using the encodeURIComponent method to ensure they are correctly parsed.
+	await mongoClient.connect();
 	const jstar = mongoClient.db('jstar');
 	const lbvs = jstar.collection('lbvs');
 //	const sbvs = jstar.collection('sbvs');
@@ -369,7 +370,6 @@ const cluster = require('cluster');
 					});
 					return;
 				}
-				assert.equal(cmdRes.insertedCount, 1);
 				res.json({
 					id: cmdRes.insertedId,
 					message: 'LBVS job created',
