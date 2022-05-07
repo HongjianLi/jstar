@@ -24,7 +24,7 @@
 		"url": "https://github.com/HongjianLi/jstar/issues"
 	},
 	"engines": {
-		"node": ">=12.16.0"
+		"node": ">=16.15.0"
 	},
 	"dependencies": {
 		"ajv": "^6.12.6",
