@@ -1,160 +1,165 @@
 #!/usr/bin/env node
-'use strict';
-const assert = require('assert').strict;
-const fs = require('fs');
-const cluster = require('cluster');
-(async () => {
-	if (cluster.isMaster) {
-		const descriptors = ['natm.u16', 'nhbd.u16', 'nhba.u16', 'nrtb.u16', 'nrng.u16', 'xmwt.f32', 'tpsa.f32', 'clgp.f32'].map((descriptor) => {
-			const type = descriptor.substr(5);
-			return {
-				file: descriptor,
-				name: descriptor.substr(0, 4),
-				type,
-				size: parseInt(type.substr(1)) / 8,
-				func: ['readUInt16LE', 'readFloatLE'][['u16', 'f32'].indexOf(type)],
-			};
+import assert from 'assert/strict';
+import fs from 'fs';
+import cluster from 'cluster';
+import mongodb from 'mongodb';
+import express from 'express';
+//import compress from 'compression';
+import bodyParser from 'body-parser';
+import favicon from 'serve-favicon';
+import errorHandler from 'errorhandler';
+import * as uuid from 'uuid';
+import child_process from 'child_process';
+import Ajv from 'ajv';
+import spdy from 'spdy';
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+if (cluster.isPrimary) {
+	const descriptors = ['natm.u16', 'nhbd.u16', 'nhba.u16', 'nrtb.u16', 'nrng.u16', 'xmwt.f32', 'tpsa.f32', 'clgp.f32'].map((descriptor) => {
+		const type = descriptor.substr(5);
+		return {
+			file: descriptor,
+			name: descriptor.substr(0, 4),
+			type,
+			size: parseInt(type.substr(1)) / 8,
+			func: ['readUInt16LE', 'readFloatLE'][['u16', 'f32'].indexOf(type)],
+		};
+	});
+	const databases = [{
+		name: 'WITHDRAWN',
+		numCompounds: 613,
+/*	}, {
+		name: 'EK-DRD',
+		numCompounds: 1870,
+	}, {
+		name: 'Biopurify',
+		numCompounds: 2103,
+	}, {
+		name: 'SuperDRUG',
+		numCompounds: 3864,
+	}, {
+		name: 'SWEETLEAD',
+		numCompounds: 4208,
+	}, {
+		name: 'HybridMolDB',
+		numCompounds: 4600,
+	}, {
+		name: 'TTD',
+		numCompounds: 5429,
+	}, {
+		name: 'PADFrag',
+		numCompounds: 5469,
+	}, {
+		name: 'TargetMol',
+		numCompounds: 5690,
+	}, {
+		name: 'GtoPdb',
+		numCompounds: 7517,
+	}, {
+		name: 'DrugBank',
+		numCompounds: 8802,
+	}, {
+		name: 'Selleckchem',
+		numCompounds: 9930,
+	}, {
+		name: 'MedChemExpress',
+		numCompounds: 14458,
+	}, {
+		name: 'NPASS',
+		numCompounds: 29295,
+	}, {
+		name: 'Pfizer',
+		numCompounds: 105864,
+	}, {
+		name: 'COCONUT',
+		numCompounds: 198224,
+	}, {
+		name: 'SureChEMBL',
+		numCompounds: 286451,
+	}, {
+		name: 'SuperNatural',
+		numCompounds: 311682,
+	}, {
+		name: 'Specs',
+		numCompounds: 683539,
+	}, {
+		name: 'ChemDiv',
+		numCompounds: 1382874,
+	}, {
+		name: 'ChEMBL',
+		numCompounds: 1828196,
+	}, {
+		name: 'GDBMedChem',
+		numCompounds: 9904832,
+	}, {
+		name: 'SCUBIDOO',
+		numCompounds: 20899717,
+	}, {
+		name: 'ZINC',
+		numCompounds: 265450385,*/
+	}].map((db) => {
+		db.descriptors = descriptors.map((descriptor) => { // Create a deep copy by either Object.assign({}, descriptor) or JSON.parse(JSON.stringify(descriptors)). Cannot use descriptors.slice() or descriptors.concat() or [...descriptors] because of shallow copy.
+			return Object.assign({}, descriptor);
 		});
-		const databases = [{
-			name: 'WITHDRAWN',
-			numCompounds: 613,
-/*		}, {
-			name: 'EK-DRD',
-			numCompounds: 1870,
-		}, {
-			name: 'Biopurify',
-			numCompounds: 2103,
-		}, {
-			name: 'SuperDRUG',
-			numCompounds: 3864,
-		}, {
-			name: 'SWEETLEAD',
-			numCompounds: 4208,
-		}, {
-			name: 'HybridMolDB',
-			numCompounds: 4600,
-		}, {
-			name: 'TTD',
-			numCompounds: 5429,
-		}, {
-			name: 'PADFrag',
-			numCompounds: 5469,
-		}, {
-			name: 'TargetMol',
-			numCompounds: 5690,
-		}, {
-			name: 'GtoPdb',
-			numCompounds: 7517,
-		}, {
-			name: 'DrugBank',
-			numCompounds: 8802,
-		}, {
-			name: 'Selleckchem',
-			numCompounds: 9930,
-		}, {
-			name: 'MedChemExpress',
-			numCompounds: 14458,
-		}, {
-			name: 'NPASS',
-			numCompounds: 29295,
-		}, {
-			name: 'Pfizer',
-			numCompounds: 105864,
-		}, {
-			name: 'COCONUT',
-			numCompounds: 198224,
-		}, {
-			name: 'SureChEMBL',
-			numCompounds: 286451,
-		}, {
-			name: 'SuperNatural',
-			numCompounds: 311682,
-		}, {
-			name: 'Specs',
-			numCompounds: 683539,
-		}, {
-			name: 'ChemDiv',
-			numCompounds: 1382874,
-		}, {
-			name: 'ChEMBL',
-			numCompounds: 1828196,
-		}, {
-			name: 'GDBMedChem',
-			numCompounds: 9904832,
-		}, {
-			name: 'SCUBIDOO',
-			numCompounds: 20899717,
-		}, {
-			name: 'ZINC',
-			numCompounds: 265450385,*/
-		}].map((db) => {
-			db.descriptors = descriptors.map((descriptor) => { // Create a deep copy by either Object.assign({}, descriptor) or JSON.parse(JSON.stringify(descriptors)). Cannot use descriptors.slice() or descriptors.concat() or [...descriptors] because of shallow copy.
-				return Object.assign({}, descriptor);
-			});
-			return db;
-		});
-		console.time('readFile');
-		await Promise.all(databases.map((db) => {
-			return Promise.all(db.descriptors.map((descriptor, index) => {
-				return fs.promises.readFile(`databases/${db.name}/${descriptor.file}`).then((buf) => {
-					assert.equal(buf.length, descriptor.size * db.numCompounds);
-					descriptor.buf = buf;
-				}, console.error);
-			}));
+		return db;
+	});
+	console.time('readFile');
+	await Promise.all(databases.map((db) => {
+		return Promise.all(db.descriptors.map((descriptor, index) => {
+			return fs.promises.readFile(`databases/${db.name}/${descriptor.file}`).then((buf) => {
+				assert.equal(buf.length, descriptor.size * db.numCompounds);
+				descriptor.buf = buf;
+			}, console.error);
 		}));
-		console.timeEnd('readFile');
-		// Fork worker processes with cluster
-		const numWorkerProcesses = 4;
-		console.log('Forking %d worker processes', numWorkerProcesses);
-		function messageHandler (msg) { // Cannot use lambda function => because of 'this' binding. The 'this.send()' statement requires capturing the worker process.
-			if (msg.query === '/cmpd/count') {
-				const { s2m } = msg; // slave to master.
-				const db = databases.find((db) => {
-					return db.name === s2m.db;
-				});
-				let numFilteredCompounds = 0;
-				for (let rowIdx = 0; rowIdx < db.numCompounds; ++rowIdx) {
-					numFilteredCompounds += +db.descriptors.every((descriptor, colIdx) => {
-						const descriptorVal = Buffer.prototype[descriptor.func].call(descriptor.buf, descriptor.size * rowIdx);
-						const descriptorCon = s2m.descriptors[colIdx];
-						return descriptorCon.lb <= descriptorVal && descriptorVal <= descriptorCon.ub;
-					});
-				}
-				this.send({
-					uuid: msg.uuid,
-					query: msg.query,
-					m2s: { // master to slave.
-						numFilteredCompounds,
-					},
-				}, (err) => { // The optional callback is a function that is invoked after the message is sent but before the slave may have received it. The function is called with a single argument: null on success, or an Error object on failure.
-					if (err) {
-						console.error(err);
-					}
+	}));
+	console.timeEnd('readFile');
+	// Fork worker processes with cluster
+	const numWorkerProcesses = 4;
+	console.log('Forking %d worker processes', numWorkerProcesses);
+	function messageHandler (msg) { // Cannot use lambda function => because of 'this' binding. The 'this.send()' statement requires capturing the worker process.
+		if (msg.query === '/cmpd/count') {
+			const { s2m } = msg; // slave to master.
+			const db = databases.find((db) => {
+				return db.name === s2m.db;
+			});
+			let numFilteredCompounds = 0;
+			for (let rowIdx = 0; rowIdx < db.numCompounds; ++rowIdx) {
+				numFilteredCompounds += +db.descriptors.every((descriptor, colIdx) => {
+					const descriptorVal = Buffer.prototype[descriptor.func].call(descriptor.buf, descriptor.size * rowIdx);
+					const descriptorCon = s2m.descriptors[colIdx];
+					return descriptorCon.lb <= descriptorVal && descriptorVal <= descriptorCon.ub;
 				});
 			}
-		};
-		for (let i = 0; i < numWorkerProcesses; ++i) {
-			cluster.fork().on('message', messageHandler); // Event 'message' occurs when the master receives a message from this specific worker.
+			this.send({
+				uuid: msg.uuid,
+				query: msg.query,
+				m2s: { // master to slave.
+					numFilteredCompounds,
+				},
+			}, (err) => { // The optional callback is a function that is invoked after the message is sent but before the slave may have received it. The function is called with a single argument: null on success, or an Error object on failure.
+				if (err) {
+					console.error(err);
+				}
+			});
 		}
-		cluster.on('exit', (worker, code, signal) => {
-			console.error(`Worker process ${worker.process.pid} died (${signal || code}). Restarting...`);
-			cluster.fork().on('message', messageHandler);
-		});
-		return;
+	};
+	for (let i = 0; i < numWorkerProcesses; ++i) {
+		cluster.fork().on('message', messageHandler); // Event 'message' occurs when the master receives a message from this specific worker.
 	}
+	cluster.on('exit', (worker, code, signal) => {
+		console.error(`Worker process ${worker.process.pid} died (${signal || code}). Restarting...`);
+		cluster.fork().on('message', messageHandler);
+	});
+} else {
 	// Connect to MongoDB
-	const mongodb = require('mongodb');
 	const mongoClient = new mongodb.MongoClient(`mongodb://localhost:27017/?authSource=jstar&maxPoolSize=3`); // https://www.mongodb.com/docs/drivers/node/current/fundamentals/connection/ Always URI encode the username and password using the encodeURIComponent method to ensure they are correctly parsed.
 	await mongoClient.connect();
 	const jstar = mongoClient.db('jstar');
 	const lbvs = jstar.collection('lbvs');
 //	const sbvs = jstar.collection('sbvs');
 	// Configure express server
-	const express = require('express');
-//	const compress = require('compression');
-	const bodyParser = require('body-parser');
-	const favicon = require('serve-favicon');
-	const errorHandler = require('errorhandler');
 	const app = express();
 //	app.use(compress());
 	app.use(bodyParser.urlencoded({ limit: '600kb', extended: false }));
@@ -162,9 +167,6 @@ const cluster = require('cluster');
 	app.use(express.static(__dirname + '/public'));
 	app.use(favicon(__dirname + '/public/favicon.ico'));
 	// Define helper variables and functions
-	const uuid = require('uuid');
-	const child_process = require('child_process');
-	const Ajv = require('ajv');
 	const ajv = new Ajv(); // { coerceTypes: true }
 	const validate = {};
 	[{
@@ -381,7 +383,7 @@ const cluster = require('cluster');
 	});
 	// Start listening
 	const https_port = 22443;
-	require('spdy').createServer({
+	spdy.createServer({
 		key: fs.readFileSync(__dirname + '/key.pem'),
 		cert: fs.readFileSync(__dirname + '/cert.pem'),
 	}, app).listen(https_port, (err) => {
@@ -391,4 +393,4 @@ const cluster = require('cluster');
 		}
 		console.log('Worker %d listening on port %d in %s mode', process.pid, https_port, app.settings.env);
 	});
-})();
+}

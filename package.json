@@ -5,6 +5,7 @@
 		"name": "Hongjian Li",
 		"email": "JackyLeeHongJian@Gmail.com"
 	},
+	"type": "module",
 	"description": "a modern website for hosting drug discovery services",
 	"keywords": [
 		"drug discovery",
