@@ -1,3 +1,4 @@
+import jstar from '../../jstar.js';
 $(() => {
 	const databases = [{
 		name: 'ZINC',
