@@ -88,7 +88,7 @@ $(() => {
 	};
 	let tickCount = 0;
 	const tick = (jobId) => {
-		$.get('/lbvs/job', { id: jobId }, async (job) => {
+		$.get('/lbvs/job', { id: jobId }, (job) => {
 			if (!job || !job.submitDate) return; // null will be returned if no job matching the id is found. { error: [] } will be returned if the job id fails the server side validation.
 			if (++tickCount === 1) {
 				$('#jobInfo1 #filename').parent().click((e) => {
@@ -174,14 +174,6 @@ $(() => {
 			});
 			const qryMolecules = parseSdf(job.qryMolSdf);
 			const hitMolecules = parseSdf(job.hitMolSdf);
-			const rdkit = await initRDKitModule();
-			job.hitMolSdf.split(/\$\$\$\$\r?\n/).filter(s => s.length).map(s => s + '$$$$\n').forEach((hitSdf, i) => {
-				if (hitMolecules[i]['canonicalSMILES']) return;
-				const hitMol = rdkit.get_mol(hitSdf);
-				const hitMolNoH = rdkit.get_mol(hitMol.remove_hs());
-//				const hitDes = JSON.parse(hitMol.get_descriptors());
-				hitMolecules[i]['canonicalSMILES'] = hitMolNoH.get_smiles();
-			});
 			[qryMolecules, hitMolecules].forEach((molecules) => {
 				molecules.forEach((mol) => {
 					['numAtoms', 'numHBD', 'numHBA', 'numRotatableBonds', 'numRings'].forEach((prop) => {
