@@ -119,7 +119,7 @@ if (cluster.isPrimary) {
 	const numWorkerProcesses = 4;
 	console.log('Forking %d worker processes', numWorkerProcesses);
 	function messageHandler (msg) { // Cannot use lambda function => because of 'this' binding. The 'this.send()' statement requires capturing the worker process.
-		if (msg.query === '/cmpd/count') {
+		if (msg.query === '/cpdb/count') {
 			const { s2m } = msg; // slave to master.
 			const db = databases.find((db) => {
 				return db.name === s2m.db;
@@ -212,7 +212,7 @@ if (cluster.isPrimary) {
 		validate[ns.name] = ajv.compile(ns.schema);
 	});
 	// Get the number of compounds satisfying filtering conditions
-	app.route('/cmpd/count').get((req, res) => {
+	app.route('/cpdb/count').get((req, res) => {
 		// Validate and sanitize user input
 /*		let v = new validator(req.query);
 		if (v
@@ -242,7 +242,7 @@ if (cluster.isPrimary) {
 		// Send query to master process
 		const s2mMsg = {
 			uuid: uuid.v4(), // Version 4 (random) - Created from cryptographically-strong random values. Version 1 (timestamp) - Created from the system clock (plus random values).
-			query: '/cmpd/count',
+			query: '/cpdb/count',
 			s2m: {
 				db: 'WITHDRAWN',
 				descriptors: [{ // natm
