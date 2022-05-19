@@ -1,7 +1,5 @@
-$(() => {
-	const intro = introJs();
-	$('#tutorial').click((e) => {
-		e.preventDefault();
-		intro.start();
-	});
+const intro = introJs();
+document.getElementById('tutorial').addEventListener('click', (e) => {
+	e.preventDefault();
+	intro.start();
 });
