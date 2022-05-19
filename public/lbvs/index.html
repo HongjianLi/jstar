@@ -6,8 +6,8 @@
 	<meta name="author" content="Hongjian Li">
 	<meta name="description" content="jstar: a modern website for hosting drug discovery services">
 	<title>jstar: drug discovery services</title>
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@4.6.1/dist/darkly/bootstrap.min.css" integrity="sha256-0tZXz4Wl0mk302PbATyRKjsHT1tI5FwnK5gY8DB5SeY=" crossorigin="anonymous">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intro.js@4.2.2/minified/introjs.min.css" integrity="sha256-r+KU+EGw8U9Q4Ij/dzbGzPKNtOjcSYJJgtWFKtGhVLg=" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.1.3/dist/darkly/bootstrap.min.css" integrity="sha256-VZi/r/RC1MritcGE2Yyxb/ACi8WIOj1Y7BHuslF8+6I=" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intro.js@5.1.0/minified/introjs.min.css" integrity="sha256-Cqx4az/zPrZICzFG/5WprT3tiQuAqx90/5VfyBkADCk=" crossorigin="anonymous">
 	<link rel="stylesheet" href="/introjs-jstar.css">
 	<link rel="stylesheet" href="/index.css">
 	<link rel="icon" href="/favicon.ico">
@@ -37,14 +37,14 @@
 		<section data-intro="Here are four simple steps to run a ligand-based virtual screen.">
 			<h4>Run a virtual screen (<a href="help">Help</a>)</h4>
 			<div class="row" role="form">
-				<div class="col-4 form-group" data-intro="Step 1. Provide a SDF file (max 500KB) containing 3D coordinates of some query compounds, which are usually known bioactives of interest.">
-					<label for="qryMolSdf"><a data-toggle="tooltip" id="qryMolSdfLabel">1) Select query compounds in 3D SDF format</a></label>
-					<input type="file" class="btn btn-primary" id="qryMolSdf">
-					<p>Examples: <a href="molnupiravir.sdf">molnupiravir</a>, <a href="vemurafenib.sdf">vemurafenib</a>, <a href="fluspirilene.sdf">fluspirilene</a></p>
+				<div class="col-4" data-intro="Step 1. Provide a SDF file (max 500KB) containing 3D coordinates of some query compounds, which are usually known bioactives of interest.">
+					<label for="qryMolSdf" class="form-label"><a data-toggle="tooltip" id="qryMolSdfLabel">1) Select query compounds in 3D SDF format</a></label>
+					<input type="file" class="form-control btn-primary" id="qryMolSdf">
+					<div class="form-text">Examples: <a href="molnupiravir.sdf">molnupiravir</a>, <a href="vemurafenib.sdf">vemurafenib</a>, <a href="fluspirilene.sdf">fluspirilene</a></div>
 				</div>
-				<div class="col-3 form-group" data-intro="Step 2. Select one of the <a href='/cmpd'>compound databases available at jstar</a> to screen.">
-					<label for="database">2) Select a database to screen</label>
-					<select class="form-control btn-primary" id="database">
+				<div class="col-3" data-intro="Step 2. Select one of the <a href='/cmpd'>compound databases available at jstar</a> to screen.">
+					<label for="database" class="form-label">2) Select a database to screen</label>
+					<select class="form-select btn-primary" id="database">
 						<option>ZINC</option>
 						<option>SCUBIDOO</option>
 						<option>GDBMedChem</option>
@@ -71,18 +71,16 @@
 						<option>WITHDRAWN</option>
 					</select>
 				</div>
-				<div class="col-3 form-group" data-intro="Step 3. Select either <a href='https://doi.org/10.1002/jcc.20681'>USR</a> or <a href='https://doi.org/10.1186/1758-2946-4-27'>USRCAT</a> score for ranking the database compounds. USR considers 3D molecular shape, while USRCAT considers pharmacophoric features too.">
-					<label for="score">3) Select a score to rank compounds</label>
-					<select class="form-control btn-primary" id="score">
+				<div class="col-3" data-intro="Step 3. Select either <a href='https://doi.org/10.1002/jcc.20681'>USR</a> or <a href='https://doi.org/10.1186/1758-2946-4-27'>USRCAT</a> score for ranking the database compounds. USR considers 3D molecular shape, while USRCAT considers pharmacophoric features too.">
+					<label for="score" class="form-label">3) Select a score to rank compounds</label>
+					<select class="form-select btn-primary" id="score">
 						<option>USR</option>
 						<option>USRCAT</option>
 					</select>
 				</div>
-				<div class="col-2 form-group" data-intro="Step 4. Submit your virtual screen. Once successful, you will be redirected to the result page with a unique URL which you can bookmark. However, an error could occur if<ul><li>no file is selected.</li><li>the file size exceeds 500KB.</li><li>the file is not in SDF format.</li><li>the SDF content cannot be parsed.</li></ul>">
-					<label for="submit">4) Go</label>
-					<div class="input-group">
-						<button class="btn btn-primary" id="submit">Submit</button>
-					</div>
+				<div class="col-2" data-intro="Step 4. Submit your virtual screen. Once successful, you will be redirected to the result page with a unique URL which you can bookmark. However, an error could occur if<ul><li>no file is selected.</li><li>the file size exceeds 500KB.</li><li>the file is not in SDF format.</li><li>the SDF content cannot be parsed.</li></ul>">
+					<label for="submit" class="form-label">4) Go</label>
+					<button class="form-control btn btn-primary" id="submit">Submit</button>
 				</div>
 			</div>
 		</section>
@@ -91,9 +89,9 @@
 		<p>&copy; 2020-2022 Chinese University of Hong Kong &nbsp; | &nbsp; Free, <a href="https://github.com/HongjianLi/jstar">open source</a>, no login requirement &nbsp; | &nbsp; <a href="" id="tutorial">Click to start a tutorial</a></p>
 	</footer>
 	<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha256-/ijcOLwFf26xEYAjW75FizKVo5tnTYiQddPZoLUHHZ8=" crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.min.js" integrity="sha256-SyTu6CwrfOhaznYZPoolVw2rxoY7lKYKQvqbtqN93HI=" crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/intro.js@4.2.2/minified/intro.min.js" integrity="sha256-TIv9PRYb23rraRLu4N1NTfU+k8InegzoVqPqIIiNhX0=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha256-2neWyvk1kBWvTs34xsy9U3BupGE5Mqm2+B5ELknV9iY=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha256-cMPWkL3FzjuaFSfEYESYmjF25hCIL6mfRSPnW8OVvM4=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/intro.js@5.1.0/minified/intro.min.js" integrity="sha256-axvn0RMyj3q3HBBvmLiaqql+2049EMgWURNikQLqFHI=" crossorigin="anonymous"></script>
 	<script src="index.js"></script>
 </body>
 </html>
