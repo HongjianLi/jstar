@@ -1,16 +1,15 @@
-const VERSION = '1.0.0';
 const atomColors = { // http://jmol.sourceforge.net/jscolors
-		H: new THREE.Color(0xFFFFFF),
-		C: new THREE.Color(0x909090),
-		N: new THREE.Color(0x3050F8),
-		O: new THREE.Color(0xFF0D0D),
-		F: new THREE.Color(0x90E050),
+	 H: new THREE.Color(0xFFFFFF),
+	 C: new THREE.Color(0x909090),
+	 N: new THREE.Color(0x3050F8),
+	 O: new THREE.Color(0xFF0D0D),
+	 F: new THREE.Color(0x90E050),
 	NA: new THREE.Color(0xAB5CF2),
 	MG: new THREE.Color(0x8AFF00),
-		P: new THREE.Color(0xFF8000),
-		S: new THREE.Color(0xFFFF30),
+	 P: new THREE.Color(0xFF8000),
+	 S: new THREE.Color(0xFFFF30),
 	CL: new THREE.Color(0x1FF01F),
-		K: new THREE.Color(0x8F40D4),
+	 K: new THREE.Color(0x8F40D4),
 	CA: new THREE.Color(0x3DFF00),
 	MN: new THREE.Color(0x9C7AC7),
 	FE: new THREE.Color(0xE06633),
@@ -24,10 +23,10 @@ const atomColors = { // http://jmol.sourceforge.net/jscolors
 	SR: new THREE.Color(0x00FF00),
 	MO: new THREE.Color(0x54B5B5),
 	CD: new THREE.Color(0xFFD98F),
-		I: new THREE.Color(0x940094),
+	 I: new THREE.Color(0x940094),
 	CS: new THREE.Color(0x57178F),
 	HG: new THREE.Color(0xB8B8D0),
-		U: new THREE.Color(0x008FFF),
+	 U: new THREE.Color(0x008FFF),
 };
 const defaultAtomColor = new THREE.Color(0xCCCCCC);
 const defaultBackgroundColor = new THREE.Color(0x000000);
