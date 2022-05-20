@@ -1,4 +1,36 @@
+import databases from '../cpdb/cpdb.js';
 $(() => {
+	const databaseSelect = $('#database');
+	$('option', databaseSelect).each((index, option) => {
+		const database = databases[index];
+		const $option = $(option);
+		console.assert(database.name === $option.text());
+		$option.text(`${database.name} (# ${database.numCompounds.thousandize()})`);
+		$option.val(`${database.name}`);
+	});
+	const cpdbName = $('#cpdbName');
+	function refreshPropertyMinMax() {
+		const cpdb = databases.find(cpdb => cpdb.name === databaseSelect.val());
+		cpdbName.text(cpdb.name);
+		cpdb.descriptors.forEach(descriptor => {
+			const { name, min, max } = descriptor;
+			$(`#${name}Min`).text(min);
+			$(`#${name}Max`).text(max);
+			$(`#slider-${name}`).slider({
+				range: true,
+				min,
+				max,
+				values: [ min, max ],
+				slide: (e, ui) => {
+					const { values } = ui;
+					$(`#${name}Min`).text(values[0]);
+					$(`#${name}Max`).text(values[1]);
+				}
+			});
+		});
+	}
+	refreshPropertyMinMax();
+	databaseSelect.change(refreshPropertyMinMax);
 	$('[data-toggle="tooltip"]').tooltip();
 	const qryMolSdfLabel = $('#qryMolSdfLabel');
 	$('#submit').click(() => {
@@ -12,7 +44,7 @@ $(() => {
 			$.post('job', {
 				qryMolSdf: e.target.result,
 				filename: qryMolSdfFile.name.substr(0, 20), // A typical ZINC15 sdf filename has 20 characters, e.g. ZINC012345678901.sdf
-				database: $('#database').val(),
+				database: databaseSelect.val(),
 				score: $('#score').val(),
 			}, (res) => {
 				if (res.error) {

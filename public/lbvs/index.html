@@ -7,6 +7,7 @@
 	<meta name="description" content="jstar: a modern website for hosting drug discovery services">
 	<title>jstar: drug discovery services</title>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.1.3/dist/darkly/bootstrap.min.css" integrity="sha256-VZi/r/RC1MritcGE2Yyxb/ACi8WIOj1Y7BHuslF8+6I=" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui-slider@1.12.1/jquery-ui.min.css" integrity="sha256-zPA30h9aT5eMMowWM2UHcwB42YsZ/MhQlO0kLM3LMTk=" crossorigin="anonymous">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intro.js@5.1.0/minified/introjs.min.css" integrity="sha256-Cqx4az/zPrZICzFG/5WprT3tiQuAqx90/5VfyBkADCk=" crossorigin="anonymous">
 	<link rel="stylesheet" href="/introjs-jstar.css">
 	<link rel="stylesheet" href="/index.css">
@@ -34,11 +35,11 @@
 		<h3><a href="/"><img src="/logo.svg" alt="logo"><strong>jstar</strong></a></h3>
 	</header>
 	<main class="container">
-		<section data-intro="Here are four simple steps to run a ligand-based virtual screen.">
+		<section data-intro="Here are five simple steps to run a ligand-based virtual screen.">
 			<h4>Run a virtual screen (<a href="help">Help</a>)</h4>
 			<div class="row" role="form">
-				<div class="col-4" data-intro="Step 1. Provide a SDF file (max 500KB) containing 3D coordinates of some query compounds, which are usually known bioactives of interest.">
-					<label for="qryMolSdf" class="form-label"><a data-toggle="tooltip" id="qryMolSdfLabel">1) Select query compounds in 3D SDF format</a></label>
+				<div class="col-3" data-intro="Step 1. Provide a SDF file (max 500KB) containing 3D coordinates of some query compounds, which are usually known bioactives of interest.">
+					<label for="qryMolSdf" class="form-label"><a data-toggle="tooltip" id="qryMolSdfLabel">1) Select query compounds in 3D SDF</a></label>
 					<input type="file" class="form-control btn-primary" id="qryMolSdf">
 					<div class="form-text">Examples: <a href="molnupiravir.sdf">molnupiravir</a>, <a href="vemurafenib.sdf">vemurafenib</a>, <a href="fluspirilene.sdf">fluspirilene</a></div>
 				</div>
@@ -74,13 +75,58 @@
 				<div class="col-3" data-intro="Step 3. Select either <a href='https://doi.org/10.1002/jcc.20681'>USR</a> or <a href='https://doi.org/10.1186/1758-2946-4-27'>USRCAT</a> score for ranking the database compounds. USR considers 3D molecular shape, while USRCAT considers pharmacophoric features too.">
 					<label for="score" class="form-label">3) Select a score to rank compounds</label>
 					<select class="form-select btn-primary" id="score">
-						<option>USR</option>
-						<option>USRCAT</option>
+						<option value="USR">USR (shape only)</option>
+						<option value="USRCAT">USRCAT (shape & atom type)</option>
 					</select>
 				</div>
-				<div class="col-2" data-intro="Step 4. Submit your virtual screen. Once successful, you will be redirected to the result page with a unique URL which you can bookmark. However, an error could occur if<ul><li>no file is selected.</li><li>the file size exceeds 500KB.</li><li>the file is not in SDF format.</li><li>the SDF content cannot be parsed.</li></ul>">
-					<label for="submit" class="form-label">4) Go</label>
+				<div class="col-2" data-intro="Step 4.Optionally select the pre-filtering ranges of desired molecular properties. Only compounds satisfying all the 8 conditions will be screened.">
+					<label for="toggle" class="form-label">4) Select descriptor ranges</label>
+					<button class="form-control btn btn-primary" id="toggle" data-bs-toggle="collapse" data-bs-target="#descriptorSliders">Toggle</button>
+				</div>
+				<div class="col-1" data-intro="Step 5. Submit your virtual screen. Once successful, you will be redirected to the result page with a unique URL which you can bookmark. However, an error could occur if<ul><li>no file is selected.</li><li>the file size exceeds 500KB.</li><li>the file is not in SDF format.</li><li>the SDF content cannot be parsed.</li></ul>">
+					<label for="submit" class="form-label">5) Go</label>
 					<button class="form-control btn btn-primary" id="submit">Submit</button>
+				</div>
+			</div>
+			<br>
+			<div class="collapse" id="descriptorSliders">
+				<p>Number of <span id="cpdbName">ZINC</span> compounds satisfying the below filtering conditions: <span id="numCompounds">11,630</span></p>
+				<div class="row">
+					<div class="col-3">
+						<label for="slider-natm" class="form-label"># heavy atoms: [<span id="natmMin">4</span>, <span id="natmMax">25</span>]</label>
+						<div id="slider-natm"></div>
+					</div>
+					<div class="col-3">
+						<label for="slider-nhbd" class="form-label"># hydrogen bond donors: [<span id="nhbdMin">2</span>, <span id="nhbdMax">4</span>]</label>
+						<div id="slider-nhbd"></div>
+					</div>
+					<div class="col-3">
+						<label for="slider-nhba" class="form-label"># hydrogen bond acceptors: [<span id="nhbaMin">4</span>, <span id="nhbaMax">6</span>]</label>
+						<div id="slider-nhba"></div>
+					</div>
+					<div class="col-3">
+						<label for="slider-nrtb" class="form-label"># rotatable bonds: [<span id="nrtbMin">4</span>, <span id="nrtbMax">6</span>]</label>
+						<div id="slider-nrtb"></div>
+					</div>
+				</div>
+				<br>
+				<div class="row">
+					<div class="col-3">
+						<label for="slider-nrng" class="form-label"># rings: [<span id="nrngMin">0</span>, <span id="nrngMax">5</span>]</label>
+						<div id="slider-nrng"></div>
+					</div>
+					<div class="col-3">
+						<label for="slider-xmwt" class="form-label">Molecular weight (g/mol): [<span id="xmwtMin">390</span>, <span id="xmwtMax">420</span>]</label>
+						<div id="slider-xmwt"></div>
+					</div>
+					<div class="col-3">
+						<label for="slider-tpsa" class="form-label">Polar surface area tPSA (&Aring;<sup>2</sup>): [<span id="tpsaMin">60</span>, <span id="tpsaMax">80</span>]</label>
+						<div id="slider-tpsa"></div>
+					</div>
+					<div class="col-3">
+						<label for="slider-clgp" class="form-label">Partition coefficient clogP: [<span id="clgpMin">1</span>, <span id="clgpMax">3</span>]</label>
+						<div id="slider-clgp"></div>
+					</div>
 				</div>
 			</div>
 		</section>
@@ -91,7 +137,9 @@
 	<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha256-2neWyvk1kBWvTs34xsy9U3BupGE5Mqm2+B5ELknV9iY=" crossorigin="anonymous"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha256-cMPWkL3FzjuaFSfEYESYmjF25hCIL6mfRSPnW8OVvM4=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/jquery-ui-slider@1.12.1/jquery-ui.min.js" integrity="sha256-SI3JTGo2nqq4qqXbcrneM2mcfWZ7S6H62oKhRbflEyE=" crossorigin="anonymous"></script>
 	<script src="https://cdn.jsdelivr.net/npm/intro.js@5.1.0/minified/intro.min.js" integrity="sha256-axvn0RMyj3q3HBBvmLiaqql+2049EMgWURNikQLqFHI=" crossorigin="anonymous"></script>
-	<script src="index.js"></script>
+	<script src="/util.js"></script>
+	<script src="index.js" type="module"></script>
 </body>
 </html>
