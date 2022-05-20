@@ -15,6 +15,7 @@ import spdy from 'spdy';
 import path from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import cpdb from './public/cpdb/cpdb.js';
 
 if (cluster.isPrimary) {
 	const descriptors = ['natm.u16', 'nhbd.u16', 'nhba.u16', 'nrtb.u16', 'nrng.u16', 'xmwt.f32', 'tpsa.f32', 'clgp.f32'].map((descriptor) => {
@@ -27,79 +28,8 @@ if (cluster.isPrimary) {
 			func: ['readUInt16LE', 'readFloatLE'][['u16', 'f32'].indexOf(type)],
 		};
 	});
-	const databases = [{
-		name: 'WITHDRAWN',
-		numCompounds: 613,
-/*	}, {
-		name: 'EK-DRD',
-		numCompounds: 1870,
-	}, {
-		name: 'Biopurify',
-		numCompounds: 2103,
-	}, {
-		name: 'SuperDRUG',
-		numCompounds: 3864,
-	}, {
-		name: 'SWEETLEAD',
-		numCompounds: 4208,
-	}, {
-		name: 'HybridMolDB',
-		numCompounds: 4600,
-	}, {
-		name: 'TTD',
-		numCompounds: 5429,
-	}, {
-		name: 'PADFrag',
-		numCompounds: 5469,
-	}, {
-		name: 'TargetMol',
-		numCompounds: 5690,
-	}, {
-		name: 'GtoPdb',
-		numCompounds: 7517,
-	}, {
-		name: 'DrugBank',
-		numCompounds: 8802,
-	}, {
-		name: 'Selleckchem',
-		numCompounds: 9930,
-	}, {
-		name: 'MedChemExpress',
-		numCompounds: 14458,
-	}, {
-		name: 'NPASS',
-		numCompounds: 29295,
-	}, {
-		name: 'Pfizer',
-		numCompounds: 105864,
-	}, {
-		name: 'COCONUT',
-		numCompounds: 198224,
-	}, {
-		name: 'SureChEMBL',
-		numCompounds: 286451,
-	}, {
-		name: 'SuperNatural',
-		numCompounds: 311682,
-	}, {
-		name: 'Specs',
-		numCompounds: 683539,
-	}, {
-		name: 'ChemDiv',
-		numCompounds: 1382874,
-	}, {
-		name: 'ChEMBL',
-		numCompounds: 1828196,
-	}, {
-		name: 'GDBMedChem',
-		numCompounds: 9904832,
-	}, {
-		name: 'SCUBIDOO',
-		numCompounds: 20899717,
-	}, {
-		name: 'ZINC',
-		numCompounds: 265450385,*/
-	}].map((db) => {
+	const databases = cpdb.slice(-1);
+	databases.map((db) => {
 		db.descriptors = descriptors.map((descriptor) => { // Create a deep copy by either Object.assign({}, descriptor) or JSON.parse(JSON.stringify(descriptors)). Cannot use descriptors.slice() or descriptors.concat() or [...descriptors] because of shallow copy.
 			return Object.assign({}, descriptor);
 		});
