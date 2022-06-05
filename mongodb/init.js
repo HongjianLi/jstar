@@ -96,3 +96,5 @@ db.lbvs.createIndex({
 }, {
 	unique: true,
 });
+
+db.adminCommand({ shutdown: 1 });
