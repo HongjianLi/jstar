@@ -11,17 +11,12 @@ db.createUser({
 	roles: [{ role: "userAdminAnyDatabase", db: "admin" }],
 });
 
-// https://docs.mongodb.com/manual/reference/method/db.auth/
-db.auth("jstarAdmin", "jstarAdminPwd");
-
 db = db.getSiblingDB("jstar");
 db.createUser({
 	user: "jstard",
 	pwd: passwordPrompt(),
 	roles: [{ role: "readWrite", db: "jstar" }],
 });
-
-//db.auth("jstard", "jstardPwd");
 
 // https://docs.mongodb.com/manual/reference/method/db.createCollection/
 // https://docs.mongodb.com/manual/reference/operator/query/jsonSchema/
