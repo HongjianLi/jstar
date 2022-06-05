@@ -84,7 +84,7 @@ if (cluster.isPrimary) {
 	});
 } else {
 	// Connect to MongoDB
-	const mongoClient = new mongodb.MongoClient(`mongodb://localhost:27017/?authSource=jstar&maxPoolSize=3`); // https://www.mongodb.com/docs/drivers/node/current/fundamentals/connection/ Always URI encode the username and password using the encodeURIComponent method to ensure they are correctly parsed.
+	const mongoClient = new mongodb.MongoClient(`mongodb://jstard:jstardPwd@localhost:27017/?authSource=jstar&maxPoolSize=3`); // https://www.mongodb.com/docs/drivers/node/current/fundamentals/connection/ Always URI encode the username and password using the encodeURIComponent method to ensure they are correctly parsed.
 	await mongoClient.connect();
 	const jstar = mongoClient.db('jstar');
 	const lbvs = jstar.collection('lbvs');
