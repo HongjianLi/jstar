@@ -3,15 +3,12 @@ import assert from 'assert/strict';
 import fs from 'fs';
 import cluster from 'cluster';
 import mongodb from 'mongodb';
-import express from 'express';
-//import compress from 'compression';
-import bodyParser from 'body-parser';
-import favicon from 'serve-favicon';
-import errorHandler from 'errorhandler';
+import Fastify from 'fastify';
+import fastifyStatic from '@fastify/static';
+import fastifyFormbody from '@fastify/formbody';
+//import fastifyFavicon from 'fastify-favicon';
 import * as uuid from 'uuid';
 import child_process from 'child_process';
-import Ajv from 'ajv';
-import spdy from 'spdy';
 import path from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -84,65 +81,29 @@ if (cluster.isPrimary) {
 	});
 } else {
 	// Connect to MongoDB
-	const mongoClient = new mongodb.MongoClient(`mongodb://jstard:jstardPwd@localhost:27017/?authSource=jstar&maxPoolSize=3`); // https://www.mongodb.com/docs/drivers/node/current/fundamentals/connection/ Always URI encode the username and password using the encodeURIComponent method to ensure they are correctly parsed.
+	const mongoClient = new mongodb.MongoClient(`mongodb://jstard:2qR8dVM9d=@localhost:27017/?authSource=jstar&maxPoolSize=3`); // https://www.mongodb.com/docs/drivers/node/current/fundamentals/connection/ Always URI encode the username and password using the encodeURIComponent method to ensure they are correctly parsed.
 	await mongoClient.connect();
 	const jstar = mongoClient.db('jstar');
 	const lbvs = jstar.collection('lbvs');
 //	const sbvs = jstar.collection('sbvs');
-	// Configure express server
-	const app = express();
-//	app.use(compress());
-	app.use(bodyParser.urlencoded({ limit: '600kb', extended: false }));
-	app.use(errorHandler({ dumpExceptions: true, showStack: true }));
-	app.use(express.static(__dirname + '/public'));
-	app.use(favicon(__dirname + '/public/favicon.ico'));
-	// Define helper variables and functions
-	const ajv = new Ajv(); // { coerceTypes: true }
-	const validate = {};
-	[{
-		name: '/lbvs/job/get',
-		schema: {
-			type: 'object',
-			properties: {
-				id: {
-					type: 'string',
-					minLength: 24,
-					maxLength: 24,
-				},
-			},
-			required: [ 'id' ],
+	const fastify = Fastify({
+		logger: true,
+		http2: true,
+		https: {
+			allowHTTP1: true, // fallback support for HTTP1
+			cert: fs.readFileSync(__dirname + "/cert.pem"),
+			key: fs.readFileSync(__dirname + "/key.pem"),
 		},
-	}, {
-		name: '/lbvs/job/post',
-		schema: {
-			type: 'object',
-			properties: {
-				filename: {
-					type: 'string',
-					minLength: 1,
-					maxLength: 20,
-				},
-				qryMolSdf: { // Caution NoSQL injection
-					type: 'string',
-					minLength: 1,
-					maxLength: 500000,
-				},
-				database: {
-					type: 'string',
-					enum: ['ZINC', 'SCUBIDOO', 'GDBMedChem', 'ChEMBL', 'ChemDiv', 'Specs', 'SuperNatural', 'SureChEMBL', 'COCONUT', 'Pfizer', 'NPASS', 'MedChemExpress', 'Selleckchem', 'DrugBank', 'GtoPdb', 'TargetMol', 'PADFrag', 'TTD', 'HybridMolDB', 'SWEETLEAD', 'SuperDRUG', 'Biopurify', 'EK-DRD', 'WITHDRAWN'],
-				},
-				score: {
-					type: 'string',
-					enum: ['USR', 'USRCAT'],
-				},
-			},
-			required: [ 'filename', 'qryMolSdf', 'database', 'score' ],
-		},
-	}].forEach((ns) => {
-		validate[ns.name] = ajv.compile(ns.schema);
 	});
+//	fastify.register(require('fastify-qs')); // https://github.com/VanoDevium/fastify-qs
+	fastify.register(fastifyStatic, { root: path.join(__dirname, 'public') }); // https://github.com/fastify/fastify-static
+	fastify.register(fastifyFormbody, { bodyLimit: 600000 }); // https://github.com/fastify/fastify-formbody
+//	fastify.register(fastifyFavicon); // https://github.com/smartiniOnGitHub/fastify-favicon
+//	import fastifyRecaptcha from 'fastify-recaptcha';
+//	fastify.register(fastifyRecaptcha, { recaptcha_secret_key: 'your_recaptcha_sercret_key' }); // https://github.com/qwertyforce/fastify-recaptcha
+	// Define helper variables and functions
 	// Get the number of compounds satisfying filtering conditions
-	app.route('/cpdb/count').get((req, res) => {
+	fastify.get('/cpdb/count', async (req, reply) => {
 		// Validate and sanitize user input
 /*		let v = new validator(req.query);
 		if (v
@@ -166,8 +127,7 @@ if (cluster.isPrimary) {
 			.range('tpsa_lb', 'tpsa_ub')
 			.range('nrtb_lb', 'nrtb_ub')
 			.failed()) {
-			res.json(v.err);
-			return;
+			return v.err;
 		}*/
 		// Send query to master process
 		const s2mMsg = {
@@ -205,7 +165,7 @@ if (cluster.isPrimary) {
 		process.send(s2mMsg, async (err) => { // The optional callback is a function that is invoked after the message is sent but before the master may have received it. The function is called with a single argument: null on success, or an Error object on failure.
 			if (err) {
 				console.error(err);
-				res.json();
+				reply.send();
 				return;
 			}
 			const m2s = await new Promise((resolve, reject) => {
@@ -217,20 +177,40 @@ if (cluster.isPrimary) {
 				});
 			});
 			m2s.timestamp = Date.now();
-			res.json(m2s);
+			return m2s;
 		});
 	});
-	app.route('/lbvs/job').get(async (req, res) => {
+	fastify.get('/lbvs/job', {
+		schema: {
+			querystring: { // body, querystring, params, and header
+				type: 'object',
+				properties: {
+					id: { type: 'string', minLength: 24, maxLength: 24 },
+				},
+				required: [ 'id' ],
+			},
+		},
+		response: {
+			200: {
+				type: 'object',
+				properties: {
+					id: { type: 'string' },
+					filename: { type: 'string' },
+					qryMolSdf: { type: 'string' },
+					database: { type: 'string' },
+					score: { type: 'string' },
+					hitMolSdf: { type: 'string' },
+					numQryMol: { type: 'number' },
+					numLibMol: { type: 'number' },
+					numLibCnf: { type: 'number' },
+				}
+			},
+		},
+	}, async (req, reply) => {
 		const reqDoc = {};
 		['id'].forEach((key) => {
 			reqDoc[key] = req.query[key];
 		});
-		if (!validate['/lbvs/job/get'](reqDoc)) {
-			res.json({
-				error: validate['/lbvs/job/get'].errors,
-			});
-			return;
-		}
 		const resDoc = await lbvs.findOne({
 			_id: new mongodb.ObjectId(reqDoc.id),
 		}, {
@@ -249,18 +229,35 @@ if (cluster.isPrimary) {
 				'numLibCnf': 1,
 			},
 		});
-		res.json(resDoc);
-	}).post((req, res) => {
+		return resDoc;
+	});
+	fastify.post('/lbvs/job', {
+		schema: {
+			body: { // body, querystring, params, and header
+				type: 'object',
+				properties: {
+					filename: { type: 'string', minLength: 1, maxLength: 20 },
+					qryMolSdf: { type: 'string', minLength: 1, maxLength: 500000 }, // Caution NoSQL injection
+					database: { type: 'string', enum: ['ZINC', 'SCUBIDOO', 'GDBMedChem', 'ChEMBL', 'ChemDiv', 'Specs', 'SuperNatural', 'SureChEMBL', 'COCONUT', 'Pfizer', 'NPASS', 'MedChemExpress', 'Selleckchem', 'DrugBank', 'GtoPdb', 'TargetMol', 'PADFrag', 'TTD', 'HybridMolDB', 'SWEETLEAD', 'SuperDRUG', 'Biopurify', 'EK-DRD', 'WITHDRAWN'] },
+					score: { type: 'string', enum: ['USR', 'USRCAT'] },
+				},
+				required: [ 'filename', 'qryMolSdf', 'database', 'score' ],
+			},
+			response: {
+				200: {
+					type: 'object',
+					properties: {
+						id: { type: 'string' },
+						message: { type: 'string' },
+					}
+				},
+			},
+		},
+	}, (req, reply) => {
 		const reqDoc = {};
 		['filename', 'qryMolSdf', 'database', 'score'].forEach((key) => {
 			reqDoc[key] = req.body[key];
 		});
-		if (!validate['/lbvs/job/post'](reqDoc)) {
-			res.json({
-				error: validate['/lbvs/job/post'].errors,
-			});
-			return;
-		}
 		const validateProc = child_process.spawn(__dirname + '/bin/validate');
 		let validateStdout = Buffer.alloc(0);
 		validateProc.stdout.on('data', (data) => {
@@ -268,7 +265,7 @@ if (cluster.isPrimary) {
 		});
 		validateProc.on('close', (code, signal) => {
 			if (code || signal) {
-				res.json({
+				reply.send({
 					code,
 					signal,
 					error: 'File not conform to the required SDF format',
@@ -297,12 +294,12 @@ if (cluster.isPrimary) {
 			lbvs.insertOne(reqDoc, (err, cmdRes) => {
 				if (err) {
 					console.error(err);
-					res.json({
+					reply.send({
 						error: err,
 					});
 					return;
 				}
-				res.json({
+				reply.send({
 					id: cmdRes.insertedId,
 					message: 'LBVS job created',
 				});
@@ -312,15 +309,11 @@ if (cluster.isPrimary) {
 		validateProc.stdin.end();
 	});
 	// Start listening
-	const https_port = 22443;
-	spdy.createServer({
-		key: fs.readFileSync(__dirname + '/key.pem'),
-		cert: fs.readFileSync(__dirname + '/cert.pem'),
-	}, app).listen(https_port, (err) => {
+	fastify.listen({ port: 22443, host: '::' }, (err, address) => {
 		if (err) {
-			console.error(err);
+			fastify.log.error(err);
 			return;
 		}
-		console.log('Worker %d listening on port %d in %s mode', process.pid, https_port, app.settings.env);
+		console.log(`Worker ${process.pid} listening on ${address}`);
 	});
 }
