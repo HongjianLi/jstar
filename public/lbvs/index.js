@@ -40,19 +40,25 @@ $(() => {
 			return;
 		}
 		const reader = new FileReader();
-		reader.onload = (e) => {
-			$.post('job', {
-				qryMolSdf: e.target.result,
-				filename: qryMolSdfFile.name.substr(0, 20), // A typical ZINC15 sdf filename has 20 characters, e.g. ZINC012345678901.sdf
-				database: databaseSelect.val(),
-				score: $('#score').val(),
-			}, (res) => {
-				if (res.error) {
-					qryMolSdfLabel.tooltip('dispose').attr('title', res.error).tooltip('show');
-					return;
-				}
-				location.assign(`result/?id=${res.id}`);
+		reader.onload = async (e) => {
+			const response = await fetch('job', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					qryMolSdf: e.target.result,
+					filename: qryMolSdfFile.name.substr(0, 20), // A typical ZINC15 sdf filename has 20 characters, e.g. ZINC012345678901.sdf
+					database: databaseSelect.val(),
+					score: $('#score').val(),
+				}),
 			});
+			const res = await response.json();
+			if (res.error) {
+				qryMolSdfLabel.tooltip('dispose').attr('title', res.error).tooltip('show');
+				return;
+			}
+			location.assign(`result/?id=${res.id}`);
 		};
 		reader.readAsText(qryMolSdfFile);
 	});
