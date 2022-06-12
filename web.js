@@ -284,6 +284,9 @@ if (cluster.isPrimary) {
 					properties: {
 						id: { type: 'string' },
 						message: { type: 'string' },
+						code: { type: 'number' },
+						signal: { type: 'string' },
+						error: { type: 'string' },
 					}
 				},
 			},
