@@ -40,7 +40,7 @@ $(() => {
 			return;
 		}
 		const reader = new FileReader();
-		reader.onload = async (e) => {
+		reader.addEventListener('load', async (e) => {
 			const response = await fetch('job', {
 				method: 'POST',
 				headers: {
@@ -59,7 +59,7 @@ $(() => {
 				return;
 			}
 			location.assign(`result/?id=${res.id}`);
-		};
+		});
 		reader.readAsText(qryMolSdfFile);
 	});
 	const intro = introJs();
