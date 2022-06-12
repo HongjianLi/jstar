@@ -1,21 +1,20 @@
 import databases from '../cpdb/cpdb.js';
-$(() => {
-	const databaseSelect = $('#database');
-	$('option', databaseSelect).each((index, option) => {
+document.addEventListener('DOMContentLoaded', () => {
+	const databaseSelect = document.getElementById('database');
+	[...databaseSelect.querySelectorAll('option')].forEach((option, index) => {
 		const database = databases[index];
-		const $option = $(option);
-		console.assert(database.name === $option.text());
-		$option.text(`${database.name} (# ${database.numCompounds.thousandize()})`);
-		$option.val(`${database.name}`);
+		console.assert(database.name === option.value);
+		option.text = `${database.name} (# ${database.numCompounds.thousandize()})`;
+		option.value = `${database.name}`;
 	});
-	const cpdbName = $('#cpdbName');
+	const cpdbName = document.getElementById('cpdbName');
 	function refreshPropertyMinMax() {
-		const cpdb = databases.find(cpdb => cpdb.name === databaseSelect.val());
-		cpdbName.text(cpdb.name);
+		const cpdb = databases.find(cpdb => cpdb.name === databaseSelect.value);
+		cpdbName.innerText = cpdb.name;
 		cpdb.descriptors.forEach(descriptor => {
 			const { name, min, max } = descriptor;
-			$(`#${name}Min`).text(min);
-			$(`#${name}Max`).text(max);
+			document.getElementById(`${name}Min`).innerText = min;
+			document.getElementById(`${name}Max`).innerText = max;
 			$(`#slider-${name}`).slider({
 				range: true,
 				min,
@@ -23,17 +22,17 @@ $(() => {
 				values: [ min, max ],
 				slide: (e, ui) => {
 					const { values } = ui;
-					$(`#${name}Min`).text(values[0]);
-					$(`#${name}Max`).text(values[1]);
+					document.getElementById(`${name}Min`).innerText = values[0];
+					document.getElementById(`${name}Max`).innerText = values[1];
 				}
 			});
 		});
 	}
 	refreshPropertyMinMax();
-	databaseSelect.change(refreshPropertyMinMax);
-	$('[data-toggle="tooltip"]').tooltip();
+	databaseSelect.addEventListener('change', refreshPropertyMinMax);
+	[...document.querySelectorAll('[data-bs-toggle="tooltip"]')].forEach(e => new bootstrap.Tooltip(e));
 	const qryMolSdfLabel = $('#qryMolSdfLabel');
-	$('#submit').click(() => {
+	document.getElementById('submit').addEventListener('click', () => {
 		const qryMolSdfFile = $('#qryMolSdf').get(0).files[0];
 		if (qryMolSdfFile === undefined || qryMolSdfFile.size > 500000) {
 			qryMolSdfLabel.tooltip('dispose').attr('title', ['Maximum 500KB', 'No file selected'][+!qryMolSdfFile]).tooltip('show');
@@ -49,8 +48,8 @@ $(() => {
 				body: JSON.stringify({
 					qryMolSdf: e.target.result,
 					filename: qryMolSdfFile.name.substr(0, 20), // A typical ZINC15 sdf filename has 20 characters, e.g. ZINC012345678901.sdf
-					database: databaseSelect.val(),
-					score: $('#score').val(),
+					database: databaseSelect.value,
+					score: document.getElementById('score').value,
 				}),
 			});
 			const res = await response.json();
@@ -63,7 +62,7 @@ $(() => {
 		reader.readAsText(qryMolSdfFile);
 	});
 	const intro = introJs();
-	$('#tutorial').click((e) => {
+	document.getElementById('tutorial').addEventListener('click', (e) => {
 		e.preventDefault();
 		intro.start();
 	});
