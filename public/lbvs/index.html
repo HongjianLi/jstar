@@ -77,16 +77,16 @@
 						<option>WITHDRAWN</option>
 					</select>
 				</div>
-				<div class="col-3" data-intro="Step 3. Select either <a href='https://doi.org/10.1002/jcc.20681'>USR</a> or <a href='https://doi.org/10.1186/1758-2946-4-27'>USRCAT</a> score for ranking the database compounds. USR considers 3D molecular shape, while USRCAT considers pharmacophoric features too.">
-					<label for="score" class="form-label">3) Select a score to rank compounds</label>
+				<div class="col-2" data-intro="Step 3. Optionally select the pre-filtering ranges of desired molecular properties. Only compounds satisfying all the 8 conditions will be screened.">
+					<label for="toggle" class="form-label">3) Select descriptor ranges</label>
+					<button class="form-control btn btn-primary" id="toggle" data-bs-toggle="collapse" data-bs-target="#descriptorSliders">Toggle</button>
+				</div>
+				<div class="col-3" data-intro="Step 4. Select either <a href='https://doi.org/10.1002/jcc.20681'>USR</a> or <a href='https://doi.org/10.1186/1758-2946-4-27'>USRCAT</a> score for ranking the database compounds. USR considers 3D molecular shape, while USRCAT considers pharmacophoric features too.">
+					<label for="score" class="form-label">4) Select a score to rank compounds</label>
 					<select class="form-select btn-primary" id="score">
 						<option value="USR">USR (shape only)</option>
 						<option value="USRCAT">USRCAT (shape & atom type)</option>
 					</select>
-				</div>
-				<div class="col-2" data-intro="Step 4.Optionally select the pre-filtering ranges of desired molecular properties. Only compounds satisfying all the 8 conditions will be screened.">
-					<label for="toggle" class="form-label">4) Select descriptor ranges</label>
-					<button class="form-control btn btn-primary" id="toggle" data-bs-toggle="collapse" data-bs-target="#descriptorSliders">Toggle</button>
 				</div>
 				<div class="col-1" data-intro="Step 5. Submit your virtual screen. Once successful, you will be redirected to the result page with a unique URL which you can bookmark. However, an error could occur if<ul><li>no file is selected.</li><li>the file size exceeds 500KB.</li><li>the file is not in SDF format.</li><li>the SDF content cannot be parsed.</li></ul>">
 					<label for="submit" class="form-label">5) Go</label>
