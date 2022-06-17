@@ -7,10 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		option.text = `${database.name} (# ${database.numCompounds.thousandize()})`;
 		option.value = `${database.name}`;
 	});
-	const cpdbName = document.getElementById('cpdbName');
 	function refreshPropertyMinMax() {
 		const cpdb = databases.find(cpdb => cpdb.name === databaseSelect.value);
-		cpdbName.innerText = cpdb.name;
 		cpdb.descriptors.forEach(descriptor => {
 			const { name, min, max } = descriptor;
 			document.getElementById(`${name}Min`).innerText = min;

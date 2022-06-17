@@ -79,7 +79,7 @@
 				</div>
 				<div class="col-2" data-intro="Step 3. Optionally select the pre-filtering ranges of desired molecular properties. Only compounds satisfying all the 8 conditions will be screened.">
 					<label for="toggle" class="form-label">3) Select descriptor ranges</label>
-					<button class="form-control btn btn-primary" id="toggle" data-bs-toggle="collapse" data-bs-target="#descriptorSliders">Toggle</button>
+					<button class="form-control btn btn-primary" id="toggle" data-bs-toggle="collapse" data-bs-target="#descriptorSliders">#cmpd = <span id="numCompounds">265,450,385</span></button>
 				</div>
 				<div class="col-3" data-intro="Step 4. Select either <a href='https://doi.org/10.1002/jcc.20681'>USR</a> or <a href='https://doi.org/10.1186/1758-2946-4-27'>USRCAT</a> score for ranking the database compounds. USR considers 3D molecular shape, while USRCAT considers pharmacophoric features too.">
 					<label for="score" class="form-label">4) Select a score to rank compounds</label>
@@ -95,7 +95,6 @@
 			</div>
 			<br>
 			<div class="collapse" id="descriptorSliders">
-				<p>Number of <span id="cpdbName">ZINC</span> compounds satisfying the below filtering conditions: <span id="numCompounds">11,630</span></p>
 				<div class="row">
 					<div class="col-3">
 						<label for="slider-natm" class="form-label"># heavy atoms: [<span id="natmMin">4</span>, <span id="natmMax">25</span>]</label>
