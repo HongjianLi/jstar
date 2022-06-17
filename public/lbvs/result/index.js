@@ -3,7 +3,7 @@ import databases from '../../cpdb/cpdb.js';
 $(() => {
 	let tickCount = 0;
 	const tick = (jobId) => {
-		$.get('/lbvs/job', { id: jobId }, (job) => {
+		fetch(`/lbvs/job?id=${jobId}`).then(response => response.json()).then((job) => {
 			if (!job || !job.submitDate) return; // null will be returned if no job matching the id is found. { error: [] } will be returned if the job id fails the server side validation.
 			if (++tickCount === 1) {
 				$('#jobInfo1 #filename').parent().click((e) => {
