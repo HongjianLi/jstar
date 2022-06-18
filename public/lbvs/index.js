@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		option.value = `${cpdb.name}`;
 	});
 	async function refreshNumFilteredCompounds() {
-		console.log('numFilteredCompounds', databaseSelect.value);
 		const cpdb = cpdbArr.find(cpdb => cpdb.name === databaseSelect.value);
 		const response = await fetch('/cpdb/count', {
 			method: 'POST',
@@ -23,12 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
 			}),
 		});
 		const result = await response.json();
-		console.log(result);
 		document.getElementById('numFilteredCompounds').innerText = result.numFilteredCompounds.thousandize();
 	}
 	function refreshDescriptorMinMax() {
 		const cpdb = cpdbArr.find(cpdb => cpdb.name === databaseSelect.value);
-		console.log('refreshDescriptorMinMax', cpdb.name);
 		cpdb.descriptors.forEach(descriptor => {
 			const { name, min, max } = descriptor;
 			document.getElementById(`${name}Min`).innerText = min;
