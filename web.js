@@ -14,7 +14,7 @@ import * as uuid from 'uuid';
 import child_process from 'child_process';
 import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-import cpdb from './public/cpdb/cpdb.js';
+import cpdbArr from './public/cpdb/cpdb.js';
 
 // Process program options.
 const options = program
@@ -41,7 +41,7 @@ if (cluster.isPrimary) {
 			func: ['readUInt16LE', 'readFloatLE'][['u16', 'f32'].indexOf(type)],
 		};
 	});
-	const databases = cpdb.slice(-1);
+	const databases = cpdbArr.filter(cpdb => ['WITHDRAWN', 'Biopurify', 'SuperDRUG', 'Selleckchem'].includes(cpdb.name)); // This filter is for debug purpose.
 	databases.map((db) => {
 		db.descriptors = descriptors.map((descriptor) => { // Create a deep copy by either Object.assign({}, descriptor) or JSON.parse(JSON.stringify(descriptors)). Cannot use descriptors.slice() or descriptors.concat() or [...descriptors] because of shallow copy.
 			return Object.assign({}, descriptor);
@@ -59,24 +59,26 @@ if (cluster.isPrimary) {
 	}));
 	console.timeEnd('readFile');
 	// Fork worker processes with cluster
-	console.log('Forking %d worker processes', options.processes);
-	function messageHandler (msg) { // Cannot use lambda function => because of 'this' binding. The 'this.send()' statement requires capturing the worker process.
-		if (msg.query === '/cpdb/count') {
-			const { s2m } = msg; // slave to master.
-			const db = databases.find((db) => {
+	console.log(`Forking ${options.processes} worker processes`);
+	function messageHandler (s2mMsg) { // Cannot use lambda function => because of 'this' binding. The 'this.send()' statement requires capturing the worker process.
+		if (s2mMsg.query === '/cpdb/count') {
+			const { s2m } = s2mMsg; // slave to master.
+			const cpdb = databases.find((db) => {
 				return db.name === s2m.db;
 			});
 			let numFilteredCompounds = 0;
-			for (let rowIdx = 0; rowIdx < db.numCompounds; ++rowIdx) {
-				numFilteredCompounds += +db.descriptors.every((descriptor, colIdx) => {
+			if (cpdb) { // This condition is for debug purpose. In a production environment, all compound databases will be read and thus cpdb is always found.
+			for (let rowIdx = 0; rowIdx < cpdb.numCompounds; ++rowIdx) {
+				numFilteredCompounds += +cpdb.descriptors.every((descriptor, colIdx) => {
 					const descriptorVal = Buffer.prototype[descriptor.func].call(descriptor.buf, descriptor.size * rowIdx);
 					const descriptorCon = s2m.descriptors[colIdx];
-					return descriptorCon.lb <= descriptorVal && descriptorVal <= descriptorCon.ub;
+					return descriptorCon.min <= descriptorVal && descriptorVal <= descriptorCon.max;
 				});
 			}
+			}
 			this.send({
-				uuid: msg.uuid,
-				query: msg.query,
+				uuid: s2mMsg.uuid,
+				query: s2mMsg.query,
 				m2s: { // master to slave.
 					numFilteredCompounds,
 				},
@@ -116,15 +118,22 @@ if (cluster.isPrimary) {
 //	fastify.register(fastifyFavicon); // https://github.com/smartiniOnGitHub/fastify-favicon
 //	import fastifyRecaptcha from 'fastify-recaptcha';
 //	fastify.register(fastifyRecaptcha, { recaptcha_secret_key: 'your_recaptcha_sercret_key' }); // https://github.com/qwertyforce/fastify-recaptcha
-	// Define helper variables and functions
 	// Get the number of compounds satisfying filtering conditions
-	fastify.get('/cpdb/count', {
+	fastify.post('/cpdb/count', {
 		schema: {
-			querystring: { // body, querystring, params, and header
+			body: { // body, querystring, params, and header
 				type: 'object',
 				properties: {
-					db: { type: 'string', enum: cpdb.map(cpdb => cpdb.name) },
-					descriptors: { type: 'object' },
+					db: { type: 'string', enum: cpdbArr.map(cpdb => cpdb.name) },
+					descriptors: { type: 'array', minItems: 1, maxItems: 8, items: {
+						type: 'object',
+						properties: {
+							name: { type: 'string', enum: cpdbArr[0].descriptors.map(d => d.name) },
+							min: { type: 'integer' },
+							max: { type: 'integer' },
+						},
+						required: [ 'name', 'min', 'max' ],
+					}},
 				},
 				required: [ 'db', 'descriptors' ],
 			},
@@ -138,64 +147,12 @@ if (cluster.isPrimary) {
 				}
 			},
 		},
-	}, async (req, reply) => {
-		// Validate and sanitize user input
-/*		let v = new validator(req.query);
-		if (v
-			.field('xmwt_lb').message('must be a decimal within [55, 567]').float().min(55).max(567).copy()
-			.field('xmwt_ub').message('must be a decimal within [55, 567]').float().min(55).max(567).copy()
-			.field('clgp_lb').message('must be a decimal within [-6, 12]').float().min(-6).max(12).copy()
-			.field('clgp_ub').message('must be a decimal within [-6, 12]').float().min(-6).max(12).copy()
-			.field('nhbd_lb').message('must be an integer within [0, 20]').int().min(0).max(20).copy()
-			.field('nhbd_ub').message('must be an integer within [0, 20]').int().min(0).max(20).copy()
-			.field('nhba_lb').message('must be an integer within [0, 18]').int().min(0).max(18).copy()
-			.field('nhba_ub').message('must be an integer within [0, 18]').int().min(0).max(18).copy()
-			.field('tpsa_lb').message('must be an integer within [0, 317]').int().min(0).max(317).copy()
-			.field('tpsa_ub').message('must be an integer within [0, 317]').int().min(0).max(317).copy()
-			.field('nrtb_lb').message('must be an integer within [0, 35]').int().min(0).max(35).copy()
-			.field('nrtb_ub').message('must be an integer within [0, 35]').int().min(0).max(35).copy()
-			.failed() || v
-			.range('xmwt_lb', 'xmwt_ub')
-			.range('clgp_lb', 'clgp_ub')
-			.range('nhbd_lb', 'nhbd_ub')
-			.range('nhba_lb', 'nhba_ub')
-			.range('tpsa_lb', 'tpsa_ub')
-			.range('nrtb_lb', 'nrtb_ub')
-			.failed()) {
-			return v.err;
-		}*/
+	}, (req, reply) => {
 		// Send query to master process
 		const s2mMsg = {
 			uuid: uuid.v4(), // Version 4 (random) - Created from cryptographically-strong random values. Version 1 (timestamp) - Created from the system clock (plus random values).
 			query: '/cpdb/count',
-			s2m: {
-				db: 'WITHDRAWN',
-				descriptors: [{ // natm
-					lb: 5,
-					ub: 55,
-				}, { // nhbd
-					lb: 4,
-					ub: 8,
-				}, { // nhba
-					lb: 4,
-					ub: 8,
-				}, { // nrtb
-					lb: 11,
-					ub: 33,
-				}, { // nrng
-					lb: 2,
-					ub: 8,
-				}, { // xmwt
-					lb: 100,
-					ub: 800,
-				}, { // tpsa
-					lb: 100,
-					ub: 400,
-				}, { // clgp
-					lb: -9,
-					ub: 12,
-				}],
-			},
+			s2m: req.body,
 		};
 		process.send(s2mMsg, async (err) => { // The optional callback is a function that is invoked after the message is sent but before the master may have received it. The function is called with a single argument: null on success, or an Error object on failure.
 			if (err) {
@@ -204,7 +161,7 @@ if (cluster.isPrimary) {
 				return;
 			}
 			const m2s = await new Promise((resolve, reject) => {
-				process.on('message', (m2sMsg) => {
+				process.once('message', (m2sMsg) => {
 					if (m2sMsg.uuid === s2mMsg.uuid) {
 						assert.equal(m2sMsg.query, s2mMsg.query);
 						resolve(m2sMsg.m2s);
@@ -273,7 +230,7 @@ if (cluster.isPrimary) {
 				properties: {
 					filename: { type: 'string', minLength: 1, maxLength: 20 },
 					qryMolSdf: { type: 'string', minLength: 1, maxLength: 500000 }, // Caution NoSQL injection
-					database: { type: 'string', enum: cpdb.map(cpdb => cpdb.name) },
+					database: { type: 'string', enum: cpdbArr.map(cpdb => cpdb.name) },
 					score: { type: 'string', enum: ['USR', 'USRCAT'] },
 				},
 				required: [ 'filename', 'qryMolSdf', 'database', 'score' ],

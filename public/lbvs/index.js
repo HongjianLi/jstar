@@ -1,33 +1,60 @@
-import databases from '../cpdb/cpdb.js';
+import cpdbArr from '../cpdb/cpdb.js';
 document.addEventListener('DOMContentLoaded', () => {
 	const databaseSelect = document.getElementById('database');
 	[...databaseSelect.querySelectorAll('option')].forEach((option, index) => {
-		const database = databases[index];
-		console.assert(database.name === option.value);
-		option.text = `${database.name} (# ${database.numCompounds.thousandize()})`;
-		option.value = `${database.name}`;
+		const cpdb = cpdbArr[index];
+		console.assert(cpdb.name === option.value);
+		option.text = `${cpdb.name} (# ${cpdb.numCompounds.thousandize()})`;
+		option.value = `${cpdb.name}`;
 	});
-	function refreshPropertyMinMax() {
-		const cpdb = databases.find(cpdb => cpdb.name === databaseSelect.value);
+	async function refreshNumFilteredCompounds() {
+		console.log('numFilteredCompounds', databaseSelect.value);
+		const cpdb = cpdbArr.find(cpdb => cpdb.name === databaseSelect.value);
+		const response = await fetch('/cpdb/count', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				db: cpdb.name,
+				descriptors: cpdb.descriptors.map(d => ({
+					name: d.name,
+					min: document.getElementById(`${d.name}Min`).innerText, 
+					max: document.getElementById(`${d.name}Max`).innerText,
+				})),
+			}),
+		});
+		const result = await response.json();
+		console.log(result);
+		document.getElementById('numFilteredCompounds').innerText = result.numFilteredCompounds.thousandize();
+	}
+	function refreshDescriptorMinMax() {
+		const cpdb = cpdbArr.find(cpdb => cpdb.name === databaseSelect.value);
+		console.log('refreshDescriptorMinMax', cpdb.name);
 		cpdb.descriptors.forEach(descriptor => {
 			const { name, min, max } = descriptor;
 			document.getElementById(`${name}Min`).innerText = min;
 			document.getElementById(`${name}Max`).innerText = max;
 			$(`#slider-${name}`).slider({
-				range: true,
 				min,
 				max,
 				values: [ min, max ],
-				slide: (e, ui) => {
-					const { values } = ui;
-					document.getElementById(`${name}Min`).innerText = values[0];
-					document.getElementById(`${name}Max`).innerText = values[1];
-				}
 			});
 		});
+		refreshNumFilteredCompounds();
 	}
-	refreshPropertyMinMax();
-	databaseSelect.addEventListener('change', refreshPropertyMinMax);
+	refreshDescriptorMinMax();
+	cpdbArr[0].descriptors.forEach(descriptor => {
+		const { name } = descriptor;
+		$(`#slider-${name}`).slider({
+			range: true,
+			stop: (e, ui) => { // Triggered after the user slides a handle. https://api.jqueryui.com/slider/
+				const { values } = ui;
+				document.getElementById(`${name}Min`).innerText = values[0];
+				document.getElementById(`${name}Max`).innerText = values[1];
+				refreshNumFilteredCompounds();
+			}
+		});
+	});
+	databaseSelect.addEventListener('change', refreshDescriptorMinMax);
 	[...document.querySelectorAll('[data-bs-toggle="tooltip"]')].forEach(e => new bootstrap.Tooltip(e));
 	const qryMolSdfLabel = $('#qryMolSdfLabel');
 	document.getElementById('submit').addEventListener('click', () => {
@@ -40,9 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		reader.addEventListener('load', async (e) => {
 			const response = await fetch('job', {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
+				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					qryMolSdf: e.target.result,
 					filename: qryMolSdfFile.name.substr(0, 20), // A typical ZINC15 sdf filename has 20 characters, e.g. ZINC012345678901.sdf
