@@ -43,12 +43,14 @@ document.addEventListener('DOMContentLoaded', () => {
 		const { name } = descriptor;
 		$(`#slider-${name}`).slider({
 			range: true,
-			stop: (e, ui) => { // Triggered after the user slides a handle. https://api.jqueryui.com/slider/
+			slide: (e, ui) => { // Triggered on every mouse move during slide. https://api.jqueryui.com/slider/
 				const { values } = ui;
 				document.getElementById(`${name}Min`).innerText = values[0];
 				document.getElementById(`${name}Max`).innerText = values[1];
+			},
+			stop: (e, ui) => { // Triggered after the user slides a handle. https://api.jqueryui.com/slider/
 				refreshNumFilteredCompounds();
-			}
+			},
 		});
 	});
 	databaseSelect.addEventListener('change', refreshDescriptorMinMax);
