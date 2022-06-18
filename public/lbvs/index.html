@@ -48,7 +48,7 @@
 					<input type="file" class="form-control btn-primary" id="qryMolSdf">
 					<div class="form-text">Examples: <a href="molnupiravir.sdf">molnupiravir</a>, <a href="vemurafenib.sdf">vemurafenib</a>, <a href="fluspirilene.sdf">fluspirilene</a></div>
 				</div>
-				<div class="col-3" data-intro="Step 2. Select one of the <a href='/cpdb/'>compound databases available at jstar</a> to screen.">
+				<div class="col-3" data-intro="Step 2. Select one of the <a href='/cpdb/'>compound databases available at jstar</a> to screen. The number in parentheses is the total number of compounds in that database.">
 					<label for="database" class="form-label">2) Select a database to screen</label>
 					<select class="form-select btn-primary" id="database">
 						<option>ZINC</option>
@@ -77,7 +77,7 @@
 						<option>WITHDRAWN</option>
 					</select>
 				</div>
-				<div class="col-2" data-intro="Step 3. Optionally select the pre-filtering ranges of desired molecular properties. Only compounds satisfying all the 8 conditions will be screened.">
+				<div class="col-2" data-intro="Step 3. Optionally select the desired ranges of eight molecular properties. Only compounds satisfying all the conditions will be screened. This acts as a pre-filter.">
 					<label for="toggle" class="form-label">3) Select descriptor ranges</label>
 					<button class="form-control btn btn-primary" id="toggle" data-bs-toggle="collapse" data-bs-target="#descriptorSliders">#cmpd = <span id="numFilteredCompounds">265,450,385</span></button>
 				</div>
