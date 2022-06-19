@@ -232,6 +232,15 @@ if (cluster.isPrimary) {
 					qryMolSdf: { type: 'string', minLength: 1, maxLength: 500000 }, // Caution NoSQL injection
 					database: { type: 'string', enum: cpdbArr.map(cpdb => cpdb.name) },
 					score: { type: 'string', enum: ['USR', 'USRCAT'] },
+					descriptors: { type: 'array', minItems: 1, maxItems: 8, items: {
+						type: 'object',
+						properties: {
+							name: { type: 'string', enum: cpdbArr[0].descriptors.map(d => d.name) },
+							min: { type: 'integer' },
+							max: { type: 'integer' },
+						},
+						required: [ 'name', 'min', 'max' ],
+					}},
 				},
 				required: [ 'filename', 'qryMolSdf', 'database', 'score' ],
 			},
@@ -250,7 +259,7 @@ if (cluster.isPrimary) {
 		},
 	}, (req, reply) => {
 		const reqDoc = {};
-		['filename', 'qryMolSdf', 'database', 'score'].forEach((key) => {
+		['filename', 'qryMolSdf', 'database', 'score', 'descriptors'].forEach((key) => {
 			reqDoc[key] = req.body[key];
 		});
 		const validateProc = child_process.spawn(__dirname + '/bin/validate');

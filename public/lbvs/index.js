@@ -72,6 +72,11 @@ document.addEventListener('DOMContentLoaded', () => {
 					filename: qryMolSdfFile.name.substr(0, 20), // A typical ZINC15 sdf filename has 20 characters, e.g. ZINC012345678901.sdf
 					database: databaseSelect.value,
 					score: document.getElementById('score').value,
+					descriptors: cpdbArr[0].descriptors.map(d => ({
+						name: d.name,
+						min: document.getElementById(`${d.name}Min`).innerText, 
+						max: document.getElementById(`${d.name}Max`).innerText,
+					})),
 				}),
 			});
 			const res = await response.json();
